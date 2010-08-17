@@ -25,6 +25,7 @@
 #include "mapper.h"
 
 #include "Config.h"
+#include "unif.h"
 
 //////////////////////////////////////////////////////////////////////////
 #include "Mapper000.h"
@@ -185,6 +186,8 @@
 #include "Mapper164.h"
 #include "Mapper165.h"
 #include "Mapper167.h"
+
+#include "UnifMapper.h"
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -347,11 +350,31 @@
 #include "Mapper165.cpp"
 #include "Mapper167.cpp"
 
+#include "UnifMapper.cpp"
+
 //////////////////////////////////////////////////////////////////////////
 // Mapper Factory
 //////////////////////////////////////////////////////////////////////////
-Mapper*	CreateMapper( NES* parent, INT no )
+Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 {
+	if( bUnif )
+	{
+		switch(no)
+		{
+			case NROM_256_CN:
+				return new map0_3208cn(parent);
+			
+			case BTL_GENIUSMERIOBROS:
+				return new GeniusMerioBros(parent);
+
+			case BTL_SMB2_C:
+				return new smb2j(parent);
+
+		//	case BMC_8157:
+		//		return new bmc8157(parent);
+		}
+		return NULL;
+	}
 	switch( no ) {
 		case	0:
 			return new Mapper000(parent);

@@ -227,9 +227,19 @@ NES::NES( const char* fname )
 		if( !(rom = new ROM(fname)) )
 			throw	"Allocating ROM failed.";
 
-		if( !(mapper = CreateMapper(this, rom->GetMapperNo())) ) {
+		if( 
+			!(mapper = CreateMapper(this, 
+			rom->IsUnifMapper()?rom->GetUnifBoard():rom->GetMapperNo(),
+									rom->IsUnifMapper()
+									)
+				)
+			)
+		{
 			// 枹僒億乕僩偺儅僢僷乕偱偡
 			LPCSTR	szErrStr = CApp::GetErrorString( IDS_ERROR_UNSUPPORTMAPPER );
+			if(rom->IsUnifMapper())
+			sprintf( szErrorString, "%s 这个 UNIF 板子暂时没有被支持，\n请联系 tensai_wang@msn.com 改进\n\n谢谢使用", rom->GetBoardName() );
+			else
 			sprintf( szErrorString, szErrStr, rom->GetMapperNo() );
 			throw	szErrorString;
 		}
@@ -3349,7 +3359,8 @@ void	NES::DelCheatCode( INT no )
 	if( m_CheatCode.size()-1 < no )
 		return;
 
-	m_CheatCode.erase( &m_CheatCode[no] );
+	//m_CheatCode.erase(&m_CheatCode[no] );
+	m_CheatCode.erase(m_CheatCode.begin()+no);
 }
 
 DWORD	NES::CheatRead( INT length, WORD addr )

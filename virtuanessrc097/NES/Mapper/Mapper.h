@@ -87,6 +87,6 @@ private:
 };
 
 // Create class instance
-extern	Mapper*	CreateMapper( NES* parent, INT no );
+extern	Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif);
 
 #endif

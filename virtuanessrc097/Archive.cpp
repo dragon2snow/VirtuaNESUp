@@ -81,12 +81,14 @@ static	LPCSTR	pszCommand[] = {
 
 static	LPCSTR	pszExtension[] = {
 	"*.nes",
+	"*.unf",
 	"*.fds",
 	"*.nsf",
 	NULL
 };
 
 static	BOOL	bFileMatching[] = {
+	FALSE,
 	FALSE,
 	TRUE,
 	FALSE,
@@ -121,7 +123,8 @@ BOOL	ZlibUnZip( LPCSTR fname, LPBYTE* ppBuf, LPDWORD lpdwSize )
 			break;
 
 		char*	pExt = ::PathFindExtension( fname_buf );
-		if( _stricmp( pExt, ".nes" ) == 0 || _stricmp( pExt, ".fds" ) == 0 || _stricmp( pExt, ".nsf" ) == 0 ) {
+		if( _stricmp( pExt, ".nes" ) == 0||_stricmp( pExt, ".unf" ) == 0 || _stricmp( pExt, ".fds" ) == 0 || _stricmp( pExt, ".nsf" ) == 0 ) 
+		{
 			if( unzipFileInfo.uncompressed_size ) {
 				if( unzOpenCurrentFile( unzipFile ) != UNZ_OK )
 					break;
