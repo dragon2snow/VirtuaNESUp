@@ -5179,6 +5179,10 @@ SOURCE=.\NES\Mapper\MapperNSF.h
 !ENDIF 
 
 # End Source File
+# Begin Source File
+
+SOURCE=.\NES\Mapper\UnifMapper.h
+# End Source File
 # End Group
 # Begin Group "ApuEx"
 
@@ -5829,6 +5833,10 @@ SOURCE=.\NES\ROMDB.h
 # Begin Source File
 
 SOURCE=.\NES\State.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\unif.cpp
 # End Source File
 # Begin Source File
 

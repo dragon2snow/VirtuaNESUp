@@ -189,8 +189,8 @@ DLGCMD	CAviConvDlg::OnRomFileBrowse( DLGCMDPARAM )
 	ofn.hwndOwner       = m_hWnd;
 	ofn.lpstrFile       = m_szRomFile;
 	ofn.nMaxFile        = sizeof(m_szRomFile);
-	ofn.lpstrFilter     = "All Support Types\0*.nes;*.fds;*.lzh;*.zip;*.rar;*.cab\0"
-			      "NES ROM (*.nes)\0*.nes\0Disk Image (*.fds)\0*.fds\0"
+	ofn.lpstrFilter     = "All Support Types\0*.nes;*.unf;*.fds;*.lzh;*.zip;*.rar;*.cab\0"
+			      "NES ROM (*.nes)\0*.nes;*.unf\0Disk Image (*.fds)\0*.fds\0"
 			      "Archive File\0*.lzh;*.zip;*.rar;*.cab\0";
 	ofn.nFilterIndex    = 1;
 	ofn.Flags           = OFN_READONLY|OFN_HIDEREADONLY|OFN_EXPLORER|OFN_PATHMUSTEXIST;

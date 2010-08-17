@@ -95,6 +95,9 @@ public:
 
 	// Mapper
 	INT	GetMapperNo() { return mapper; }
+	BOOL IsUnifMapper(){ return bUnif;}
+	INT		GetUnifBoard(){return board;}
+	CHAR * GetBoardName(){return pboardname;}
 
 	// Disks
 	INT	GetDiskNo() { return diskno; }
@@ -130,6 +133,9 @@ protected:
 
 	INT		mapper;
 	INT		diskno;
+	INT		board;
+	BOOL	bUnif;
+	CHAR	pboardname[MAX_PATH];
 
 	// For PAL(Database)
 	BOOL		bPAL;

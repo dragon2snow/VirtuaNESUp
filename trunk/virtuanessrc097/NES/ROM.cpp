@@ -31,6 +31,13 @@
 
 #include "ips.h"
 
+#include "unif.h"
+
+#define MKID(a) ((unsigned long) \
+	(((a) >> 24) & 0x000000FF) | \
+	(((a) >>  8) & 0x0000FF00) | \
+	(((a) <<  8) & 0x00FF0000) | \
+		(((a) << 24) & 0xFF000000))
 //
 // 僐儞僗僩儔僋僞
 //
@@ -48,13 +55,16 @@ LONG	FileSize;
 	bPAL = FALSE;
 	bNSF = FALSE;
 	NSF_PAGE_SIZE = 0;
+	
+	board = 0;
+	bUnif = FALSE;
 
 	lpPRG = lpCHR = lpTrainer = lpDiskBios = lpDisk = NULL;
 
 	crc = crcall = 0;
 	mapper = 0;
 	diskno = 0;
-
+	
 	try {
 		if( !(fp = ::fopen( fname, "rb" )) ) {
 			// xxx 僼傽僀儖傪奐偗傑偣傫
@@ -102,7 +112,12 @@ LONG	FileSize;
 			&& header.ID[2] == 'S' && header.ID[3] == 'M') {
 			// 僿僢僟僐僺乕
 			memcpy( &header, temp, sizeof(NESHEADER) );
-		} else {
+		} else if( header.ID[0] == 'U' && header.ID[1] == 'N'
+			&& header.ID[2] == 'I' && header.ID[3] == 'F')
+		{
+			//处理Unif ROM	
+		}else
+		{
 			FREE( temp );
 
 			if( !UnCompress( fname, &temp, (LPDWORD)&FileSize ) ) {
@@ -130,9 +145,159 @@ LONG	FileSize;
 		}
 
 		DWORD	PRGoffset, CHRoffset;
-		LONG	PRGsize, CHRsize;
+		LONG	PRGsize=0, CHRsize=0;
+		BYTE *pUnif = temp;
+		DWORD filesize = FileSize;
 
-		if( header.ID[0] == 'N' && header.ID[1] == 'E'
+		if ( header.ID[0] == 'U' && header.ID[1] == 'N'
+		 && header.ID[2] == 'I' && header.ID[3] == 'F' )
+		{//处理UNIF
+			
+			DWORD Signature, BlockLen;
+			DWORD ipos =0x20;//跳过UNIF头
+			BYTE id,i;
+			BYTE *tPRG[0x10], *tCHR[0x10];
+			DWORD sizePRG[0x10],sizeCHR[0x10];
+			//char info[100];
+			//char name[100];
+			
+			header.ID[0] = 'N';
+			header.ID[1] = 'E';
+			header.ID[2] = 'S';
+			header.ID[3] = 0x1A;
+			
+			board = 0;
+			bUnif = TRUE;
+
+		//	header.PRG_PAGE_SIZE = (BYTE)diskno*4;
+		//	header.CHR_PAGE_SIZE = 0;
+		//	header.control1 = 0x40;
+		//	header.control2 = 0x10;
+			header.control1 = 0;
+			header.control2 = 0;
+			
+			
+			for (i = 0; i < 0x10; i++)
+			{
+				tPRG[i] = tCHR[i] = 0;
+			}
+
+			//filesize
+			while(ipos<filesize)
+			{
+				id = 0;
+				memcpy(&Signature,&pUnif[ipos],4);ipos+=4;
+				memcpy(&BlockLen,&pUnif[ipos],4);ipos+=4;
+				
+				switch(Signature)
+				{
+					case MKID('MAPR')://board名字
+						memcpy( pboardname, &pUnif[ipos], BlockLen);
+						//memcpy( info, &pUnif[ipos], BlockLen);
+						//fl.info = info;
+						ipos+=BlockLen;	break;
+
+					case MKID('NAME'):
+						//memcpy( pboardname, &pUnif[ipos], BlockLen);
+						//fl.title = name;
+						ipos+=BlockLen;	break;
+
+						
+					case MKID('MIRR'):
+						if (pUnif[ipos]==0)
+							header.control1 &=14;
+						else if (pUnif[ipos]==1)
+							header.control1 |=1;
+						ipos+=BlockLen;
+						break;
+					
+					case MKID('PRGF'):	id++;
+					case MKID('PRGE'):	id++;
+					case MKID('PRGD'):	id++;
+					case MKID('PRGC'):	id++;
+					case MKID('PRGB'):	id++;
+					case MKID('PRGA'):	id++;
+					case MKID('PRG9'):	id++;
+					case MKID('PRG8'):	id++;
+					case MKID('PRG7'):	id++;
+					case MKID('PRG6'):	id++;
+					case MKID('PRG5'):	id++;
+					case MKID('PRG4'):	id++;
+					case MKID('PRG3'):	id++;
+					case MKID('PRG2'):	id++;
+					case MKID('PRG1'):	id++;
+					case MKID('PRG0'):
+						sizePRG[id] = BlockLen;
+						tPRG[id] = (BYTE*)malloc(BlockLen);
+						memcpy( tPRG[id], &pUnif[ipos], BlockLen);
+						ipos+=BlockLen;
+						PRGsize += BlockLen;
+						break;
+
+					case MKID('CHRF'):	id++;
+					case MKID('CHRE'):	id++;
+					case MKID('CHRD'):	id++;
+					case MKID('CHRC'):	id++;
+					case MKID('CHRB'):	id++;
+					case MKID('CHRA'):	id++;
+					case MKID('CHR9'):	id++;
+					case MKID('CHR8'):	id++;
+					case MKID('CHR7'):	id++;
+					case MKID('CHR6'):	id++;
+					case MKID('CHR5'):	id++;
+					case MKID('CHR4'):	id++;
+					case MKID('CHR3'):	id++;
+					case MKID('CHR2'):	id++;
+					case MKID('CHR1'):	id++;
+					case MKID('CHR0'):
+						sizeCHR[id] = BlockLen;
+						tCHR[id] = (BYTE*)malloc(BlockLen);
+						memcpy( tCHR[id], &pUnif[ipos], BlockLen);
+						ipos+=BlockLen;
+						CHRsize += BlockLen;
+						break;
+						
+					default:
+						ipos+=BlockLen;	break;
+				}
+			}
+
+			//fl.mapper = 0;
+			//fl.prg_size = 0;
+			//fl.chr_size = 0;
+
+			board = NES_ROM_get_unifBoardID(pboardname);
+			
+			header.PRG_PAGE_SIZE = PRGsize/(16*1024);
+			header.CHR_PAGE_SIZE = CHRsize/(8*1024);
+
+			DWORD LenPRG=0,LenCHR=0;
+			if(PRGsize)
+				lpPRG = (LPBYTE)malloc( PRGsize );
+			if(CHRsize)
+				lpCHR = (LPBYTE)malloc( CHRsize );
+
+			for (i = 0; i < 16/*0x10*/; i++)
+			{
+				if (tPRG[i])
+				{
+					memcpy(&lpPRG[LenPRG], tPRG[i], sizePRG[i]);
+					LenPRG += sizePRG[i];
+					//fl.prg_size  += sizePRG[i]>>14;
+					//PRGsize = PRGsize+LenPRG;
+					free(tPRG[i]);
+				}
+				if (tCHR[i])
+				{
+					memcpy(&lpCHR[LenCHR], tCHR[i], sizeCHR[i]);
+					LenCHR += sizeCHR[i];
+					//fl.chr_size = (fl.chr_size)+(sizeCHR[i]>>13);
+					//CHRsize =  CHRsize+LenCHR;
+					free(tCHR[i]);
+				}
+			}
+
+		}else	if( header.ID[0] == 'N' && header.ID[1] == 'E'
 		 && header.ID[2] == 'S' && header.ID[3] == 0x1A ) {
 		// 晛捠偺NES僼傽僀儖
 			PRGsize = (LONG)header.PRG_PAGE_SIZE*0x4000;
@@ -424,7 +589,12 @@ NESHEADER	header;
 	}
 	FCLOSE( fp );
 
-	if( header.ID[0] == 'N' && header.ID[1] == 'E'
+	if( header.ID[0] == 'U' && header.ID[1] == 'N'
+	 && header.ID[2] == 'I' && header.ID[3] == 'F' )
+	{
+		return 0;
+	}
+	else if( header.ID[0] == 'N' && header.ID[1] == 'E'
 	 && header.ID[2] == 'S' && header.ID[3] == 0x1A ) {
 		for( INT i = 0; i < 8; i++ ) {
 			if( header.reserved[i] )
@@ -454,6 +624,9 @@ NESHEADER	header;
 			return	0;
 		} else if( header.ID[0] == 'F' && header.ID[1] == 'D'
 			&& header.ID[2] == 'S' && header.ID[3] == 0x1A ) {
+			return	0;
+		} else if( header.ID[0] == 'U' && header.ID[1] == 'N'
+			&& header.ID[2] == 'I' && header.ID[3] == 'F' ) {
 			return	0;
 		} else if( header.ID[0] == 'N' && header.ID[1] == 'E'
 			&& header.ID[2] == 'S' && header.ID[3] == 'M') {

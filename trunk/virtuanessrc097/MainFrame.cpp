@@ -1002,8 +1002,8 @@ WNDCMD	CMainFrame::OnFileOpen( WNDCMDPARAM )
 	ofn.hwndOwner       = m_hWnd;
 	ofn.lpstrFile       = szFile;
 	ofn.nMaxFile        = sizeof(szFile);
-	ofn.lpstrFilter     = "All Support Types\0*.nes;*.fds;*.nsf;*.lzh;*.zip;*.rar;*.cab\0"
-			      "NES ROM (*.nes)\0*.nes\0Disk Image (*.fds)\0*.fds\0"
+	ofn.lpstrFilter     = "All Support Types\0*.nes;*.fds;*.unf;*.nsf;*.lzh;*.zip;*.rar;*.cab\0"
+			      "NES ROM (*.nes)\0*.nes;*.unf\0Disk Image (*.fds)\0*.fds\0"
 			      "NES Music File (*.nsf)\0*.nsf\0Archive File\0*.lzh;*.zip;*.rar;*.cab\0";
 	ofn.nFilterIndex    = 1;
 	ofn.Flags           = OFN_READONLY|OFN_HIDEREADONLY|OFN_EXPLORER|OFN_PATHMUSTEXIST;
@@ -1180,8 +1180,8 @@ WNDCMD	CMainFrame::OnRecentOpenPath( WNDCMDPARAM )
 	ofn.hwndOwner       = m_hWnd;
 	ofn.lpstrFile       = szFile;
 	ofn.nMaxFile        = sizeof(szFile);
-	ofn.lpstrFilter     = "All Support Types\0*.nes;*.fds;*.nsf;*.lzh;*.zip;*.rar;*.cab\0"
-			      "NES ROM (*.nes)\0*.nes\0Disk Image (*.fds)\0*.fds\0"
+	ofn.lpstrFilter     = "All Support Types\0*.nes;*.unf;*.fds;*.nsf;*.lzh;*.zip;*.rar;*.cab\0"
+			      "NES ROM (*.nes)\0*.nes;*.unf\0Disk Image (*.fds)\0*.fds\0"
 			      "NES Music File (*.nsf)\0*.nsf\0Archive File\0*.lzh;*.zip;*.rar;*.cab\0";
 	ofn.nFilterIndex    = 1;
 	ofn.Flags           = OFN_READONLY|OFN_HIDEREADONLY|OFN_EXPLORER|OFN_PATHMUSTEXIST;
@@ -2823,7 +2823,8 @@ void	CMainFrame::OnUpdateMenu( HMENU hMenu, UINT uID )
 			const UCHAR seps[] = " \t\0";	// セパレータ
 
 			// ID番号からインデックスを探す
-			for( INT i = 0; CConfig::ShortcutKeyID[i*3+0] != uID; i++ );
+			INT i ;
+			for( i = 0; CConfig::ShortcutKeyID[i*3+0] != uID; i++ );
 
 			::GetMenuString( m_hMenu, CConfig::ShortcutKeyID[i*3+0], szMenuString, 256, MF_BYCOMMAND );
 
