@@ -142,6 +142,7 @@
 #include "Mapper193.h"
 #include "Mapper194.h"
 #include "Mapper198.h"
+#include "Mapper199.h"
 #include "Mapper222.h"
 #include "Mapper225.h"
 #include "Mapper226.h"
@@ -306,6 +307,7 @@
 #include "Mapper193.cpp"
 #include "Mapper194.cpp"
 #include "Mapper198.cpp"
+#include "Mapper199.cpp"
 #include "Mapper222.cpp"
 #include "Mapper225.cpp"
 #include "Mapper226.cpp"
@@ -602,6 +604,8 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			return new Mapper194(parent);
 		case	198:
 			return new Mapper198(parent);
+		case	199:
+			return new Mapper199(parent);
 		case	222:
 			return new Mapper222(parent);
 		case	225:
