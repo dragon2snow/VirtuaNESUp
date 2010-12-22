@@ -21,7 +21,7 @@ public:
 
 protected:
 	BYTE	reg[8];
-	BYTE	prg0, prg1;
+	BYTE	prg[4];
 	BYTE	chr[8];
 	BYTE	we_sram;
 
