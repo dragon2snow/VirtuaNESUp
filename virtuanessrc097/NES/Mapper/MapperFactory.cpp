@@ -189,6 +189,7 @@
 #include "Mapper167.h"
 
 #include "UnifMapper.h"
+#include "Subor.h"
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -353,6 +354,7 @@
 #include "Mapper167.cpp"
 
 #include "UnifMapper.cpp"
+#include "Subor.cpp"
 
 //////////////////////////////////////////////////////////////////////////
 // Mapper Factory
@@ -372,8 +374,8 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			case BTL_SMB2_C:
 				return new smb2j(parent);
 
-		//	case BMC_8157:
-		//		return new bmc8157(parent);
+			case SUBOR_999:
+				return new MapperSubor999(parent);
 		}
 		return NULL;
 	}
@@ -688,7 +690,8 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			return new Mapper165(parent);
 		case	167:
 			return new Mapper167(parent);
-
+		case	168:			
+			return new MapperSubor999(parent);
 		default:
 			break;
 	}

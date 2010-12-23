@@ -354,6 +354,7 @@ const BOARDINFO BoardInfo[]=
 	{ "UNL-TF1201",                  UNL_TF1201               },
 	{ "VIRGIN-SNROM",                STD_SNROM                },
 	{ "NES-NROM-256-CN",             NROM_256_CN              },
+	{ "SUBOR_999",					 SUBOR_999				  },
 };
                                     
                                 

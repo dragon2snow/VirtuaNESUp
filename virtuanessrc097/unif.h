@@ -454,6 +454,8 @@ enum BoardID
 	WHIRLWIND_2706             ,
 	// Unknown
 	NROM_256_CN		   ,
+	// ÐÂ¼Ó
+	SUBOR_999,
 	BOARD_MAX
 };
 
