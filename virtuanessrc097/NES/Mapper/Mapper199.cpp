@@ -16,6 +16,15 @@ void	Mapper199::Reset()
 
 	we_sram  = 0;	
 	irq_enable=irq_counter=irq_latch=irq_request = 0;
+
+	
+	DWORD	crcP = nes->rom->GetPROM_CRC();	
+	DWORD	crcV = nes->rom->GetVROM_CRC();
+
+	if( (crcP==0xE80D8741)||(crcV==0x3846520D))
+	{//外星霸王的大陆
+		nes->SetRenderMethod( NES::POST_ALL_RENDER );
+	}
 }
 
 
