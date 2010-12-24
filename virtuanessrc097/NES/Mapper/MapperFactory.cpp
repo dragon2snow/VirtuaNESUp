@@ -28,6 +28,7 @@
 #include "unif.h"
 
 //////////////////////////////////////////////////////////////////////////
+#include "MMC3.h"
 #include "Mapper000.h"
 #include "Mapper001.h"
 #include "Mapper002.h"
@@ -189,10 +190,12 @@
 #include "Mapper167.h"
 
 #include "UnifMapper.h"
+#include "fk23c.h"
 #include "Subor.h"
 
 //////////////////////////////////////////////////////////////////////////
 
+#include "MMC3.cpp"
 #include "Mapper000.cpp"
 #include "Mapper001.cpp"
 #include "Mapper002.cpp"
@@ -354,6 +357,7 @@
 #include "Mapper167.cpp"
 
 #include "UnifMapper.cpp"
+#include "fk23c.cpp"
 #include "Subor.cpp"
 
 //////////////////////////////////////////////////////////////////////////
@@ -376,6 +380,9 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 
 			case SUBOR_999:
 				return new MapperSubor999(parent);
+
+			case BMC_FKC23C:
+				return new MapperFk23c(parent);
 		}
 		return NULL;
 	}
@@ -592,6 +599,8 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			return new Mapper142(parent);
 		case	160:
 			return new Mapper160(parent);
+		case 176:
+			return new MapperFk23c(parent);
 		case	182:
 			return new Mapper182(parent);
 		case	183:
