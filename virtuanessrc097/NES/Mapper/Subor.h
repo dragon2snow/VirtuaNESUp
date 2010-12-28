@@ -18,7 +18,7 @@ public:
 	void	LoadState( LPBYTE p );
 
 protected:
-	BYTE	reg5200,reg5000;
+	BYTE	reg5200,reg5000,reg480d;
 	void	SetBank_CPU(void);
 private:
 };
