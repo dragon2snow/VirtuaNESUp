@@ -192,6 +192,7 @@
 #include "UnifMapper.h"
 #include "fk23c.h"
 #include "Subor.h"
+#include "SmartGenius.h"
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -359,6 +360,7 @@
 #include "UnifMapper.cpp"
 #include "fk23c.cpp"
 #include "Subor.cpp"
+#include "SmartGenius.cpp"
 
 //////////////////////////////////////////////////////////////////////////
 // Mapper Factory
@@ -383,6 +385,10 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 
 			case BMC_FKC23C:
 				return new MapperFk23c(parent);
+
+			case SMART_GENIUS:
+				return new MapperSmartGenius(parent);
+				//return new Mapper199(parent);
 		}
 		return NULL;
 	}

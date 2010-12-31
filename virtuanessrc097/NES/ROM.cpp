@@ -99,6 +99,8 @@ LONG	FileSize;
 
 		// ヘッダコピー
 		::memcpy( &header, temp, sizeof(NESHEADER) );
+		header.CHR_PAGE_SIZE = header.dummy_CHR_PAGE_SIZE;
+		header.PRG_PAGE_SIZE = header.dummy_PRG_PAGE_SIZE;
 
 		if( header.ID[0] == 'N' && header.ID[1] == 'E'
 		 && header.ID[2] == 'S' && header.ID[3] == 0x1A ) {
@@ -193,6 +195,7 @@ LONG	FileSize;
 				{
 					case MKID('MAPR')://boardﾃ錥ﾖ
 						memcpy( pboardname, &pUnif[ipos], BlockLen);
+						pboardname[BlockLen]=0;
 						//memcpy( info, &pUnif[ipos], BlockLen);
 						//fl.info = info;
 						ipos+=BlockLen;	break;
