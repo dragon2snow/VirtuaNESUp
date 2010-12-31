@@ -388,7 +388,7 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 
 			case SMART_GENIUS:
 				return new MapperSmartGenius(parent);
-				//return new Mapper199(parent);
+				//return new MapperFk23c(parent);
 		}
 		return NULL;
 	}

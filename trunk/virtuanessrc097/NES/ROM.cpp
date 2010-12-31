@@ -106,14 +106,20 @@ LONG	FileSize;
 		 && header.ID[2] == 'S' && header.ID[3] == 0x1A ) {
 			// ヘッダコピー
 			memcpy( &header, temp, sizeof(NESHEADER) );
+			header.CHR_PAGE_SIZE = header.dummy_CHR_PAGE_SIZE;
+			header.PRG_PAGE_SIZE = header.dummy_PRG_PAGE_SIZE;
 		} else if( header.ID[0] == 'F' && header.ID[1] == 'D'
 			&& header.ID[2] == 'S' && header.ID[3] == 0x1A ) {
 			// ヘッダコピー
-			memcpy( &header, temp, sizeof(NESHEADER) );
+			memcpy( &header, temp, sizeof(NESHEADER) );			
+			header.CHR_PAGE_SIZE = header.dummy_CHR_PAGE_SIZE;
+			header.PRG_PAGE_SIZE = header.dummy_PRG_PAGE_SIZE;
 		} else if( header.ID[0] == 'N' && header.ID[1] == 'E'
 			&& header.ID[2] == 'S' && header.ID[3] == 'M') {
 			// ヘッダコピー
 			memcpy( &header, temp, sizeof(NESHEADER) );
+			header.CHR_PAGE_SIZE = header.dummy_CHR_PAGE_SIZE;
+			header.PRG_PAGE_SIZE = header.dummy_PRG_PAGE_SIZE;
 		} else if( header.ID[0] == 'U' && header.ID[1] == 'N'
 			&& header.ID[2] == 'I' && header.ID[3] == 'F')
 		{
@@ -127,7 +133,9 @@ LONG	FileSize;
 				throw	CApp::GetErrorString( IDS_ERROR_UNSUPPORTFORMAT );
 			}
 			// ヘッダコピー
-			::memcpy( &header, temp, sizeof(NESHEADER) );
+			::memcpy( &header, temp, sizeof(NESHEADER) );			
+			header.CHR_PAGE_SIZE = header.dummy_CHR_PAGE_SIZE;
+			header.PRG_PAGE_SIZE = header.dummy_PRG_PAGE_SIZE;
 		}
 
 		// Since the zip/fds/nes is defrosted and raw, now apply the patch
@@ -140,6 +148,8 @@ LONG	FileSize;
 			::memcpy( ipstemp, temp, FileSize );
 			if( ApplyIPS( fname, ipstemp, FileSize ) ) {
 				::memcpy( &header, ipstemp, sizeof(NESHEADER) );
+				header.CHR_PAGE_SIZE = header.dummy_CHR_PAGE_SIZE;
+				header.PRG_PAGE_SIZE = header.dummy_PRG_PAGE_SIZE;
 				::memcpy( temp, ipstemp, FileSize );
 			}
 
@@ -601,7 +611,7 @@ NESHEADER	header;
 	 && header.ID[2] == 'S' && header.ID[3] == 0x1A ) {
 		for( INT i = 0; i < 8; i++ ) {
 			if( header.reserved[i] )
-				return	IDS_ERROR_ILLEGALHEADER;
+				;//return	IDS_ERROR_ILLEGALHEADER;
 		}
 		return	0;
 	} else if( header.ID[0] == 'F' && header.ID[1] == 'D'
@@ -617,12 +627,14 @@ NESHEADER	header;
 			return	IDS_ERROR_UNSUPPORTFORMAT;
 
 		memcpy( &header, temp, sizeof(NESHEADER) );
+		header.CHR_PAGE_SIZE = header.dummy_CHR_PAGE_SIZE;
+		header.PRG_PAGE_SIZE = header.dummy_PRG_PAGE_SIZE;
 		FREE( temp );
 		if( header.ID[0] == 'N' && header.ID[1] == 'E'
 		 && header.ID[2] == 'S' && header.ID[3] == 0x1A ) {
 			for( INT i = 0; i < 8; i++ ) {
 				if( header.reserved[i] )
-					return	IDS_ERROR_ILLEGALHEADER;
+					;//return	IDS_ERROR_ILLEGALHEADER;
 			}
 			return	0;
 		} else if( header.ID[0] == 'F' && header.ID[1] == 'D'

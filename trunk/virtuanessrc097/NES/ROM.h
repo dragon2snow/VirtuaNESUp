@@ -23,7 +23,8 @@ typedef	struct	tagNESHEADER {
 	BYTE	dummy_CHR_PAGE_SIZE;
 	BYTE	control1;
 	BYTE	control2;
-	BYTE	reserved[8];
+	//BYTE	reserved[8];
+	BYTE	reserved[4];
 	WORD	PRG_PAGE_SIZE;
 	WORD	CHR_PAGE_SIZE;
 } NESHEADER;
