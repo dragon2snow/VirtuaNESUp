@@ -70,9 +70,9 @@ BOOL	ROMDATABASE::HeaderCorrect( NESHEADER& hdr, DWORD crcall, DWORD crc )
 	if( data.crcall == crcall || (data.crc == crc && data.crc) ) {
 		hdr.control1 = data.control1;
 		hdr.control2 = data.control2;
-		for( INT i = 0; i < 8; i++ ) {
-			hdr.reserved[i] = 0;
-		}
+		//for( INT i = 0; i < 8; i++ ) {
+		//	hdr.reserved[i] = 0;
+		//}
 		return	TRUE;
 	}
 	return	FALSE;
