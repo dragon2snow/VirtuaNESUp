@@ -386,6 +386,7 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 				return new MapperSubor999(parent);
 
 			case BMC_FKC23C:
+			case FK23C:
 				return new MapperFk23c(parent);
 			case FK23CA:
 				return new MapperFk23ca(parent);

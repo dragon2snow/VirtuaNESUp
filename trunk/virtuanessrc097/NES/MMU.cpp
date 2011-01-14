@@ -165,6 +165,9 @@ void	SetVROM_Bank( BYTE page, LPBYTE ptr, BYTE type )
 
 void	SetVROM_1K_Bank( BYTE page, INT bank )
 {
+	if(VROM_1K_SIZE==0)
+		return;
+
 	bank %= VROM_1K_SIZE;
 	PPU_MEM_BANK[page] = VROM+0x0400*bank;
 	PPU_MEM_TYPE[page] = BANKTYPE_VROM;
