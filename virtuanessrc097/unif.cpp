@@ -355,6 +355,9 @@ const BOARDINFO BoardInfo[]=
 	{ "VIRGIN-SNROM",                STD_SNROM                },
 	{ "NES-NROM-256-CN",             NROM_256_CN              },
 	{ "SUBOR_999",					 SUBOR_999				  },
+	{ "SMART_GENIUS",				 SMART_GENIUS			  },
+	{ "FK23CA",						 FK23CA					  },
+	{ "FK23C",						 FK23C					  },
 };
                                     
                                 

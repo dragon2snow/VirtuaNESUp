@@ -456,6 +456,9 @@ enum BoardID
 	NROM_256_CN		   ,
 	// ÐÂ¼Ó
 	SUBOR_999,
+	SMART_GENIUS,
+	FK23CA,
+	FK23C,
 	BOARD_MAX
 };
 
