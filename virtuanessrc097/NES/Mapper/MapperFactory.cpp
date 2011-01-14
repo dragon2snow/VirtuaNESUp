@@ -136,6 +136,7 @@
 #include "Mapper140.h"
 #include "Mapper142.h"
 #include "Mapper160.h"
+#include "Mapper162.h"
 #include "Mapper182.h"
 #include "Mapper183.h"
 #include "Mapper190.h"
@@ -305,6 +306,7 @@
 #include "Mapper140.cpp"
 #include "Mapper142.cpp"
 #include "Mapper160.cpp"
+#include "Mapper162.cpp"
 #include "Mapper182.cpp"
 #include "Mapper183.cpp"
 #include "Mapper190.cpp"
@@ -385,6 +387,8 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 
 			case BMC_FKC23C:
 				return new MapperFk23c(parent);
+			case FK23CA:
+				return new MapperFk23ca(parent);
 
 			case SMART_GENIUS:
 				return new MapperSmartGenius(parent);
@@ -605,6 +609,8 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			return new Mapper142(parent);
 		case	160:
 			return new Mapper160(parent);
+		case	162:
+			return new Mapper162(parent);
 		case 176:
 			return new MapperFk23c(parent);
 		case	182:

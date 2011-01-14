@@ -23,6 +23,16 @@ protected:
 private:
 	void fk23c_UpdatePrg2p(unsigned int addr,unsigned int bank);
 	void fk23c_UpdateChr2p(unsigned int addr,unsigned int bank);
-	void fk23c_UpdatePrg();
+	virtual void fk23c_UpdatePrg();
 	void fk23c_UpdateChr();
+};
+
+class	MapperFk23ca : public MapperFk23c
+{
+public:
+	MapperFk23ca( NES* parent );
+	void	Reset();
+
+private:
+	void fk23c_UpdatePrg();
 };
