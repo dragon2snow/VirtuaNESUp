@@ -183,3 +183,51 @@ void	MapperFk23c::LoadState( LPBYTE p )
 	prg[2]  = p[ 22];
 	prg[3]  = p[ 23];*/
 }
+
+
+
+MapperFk23ca::MapperFk23ca( NES* parent ) : MapperFk23c(parent)
+{
+}
+
+void	MapperFk23ca::Reset()
+{
+	uint8 i;
+	for (i=0; i < 8; ++i)
+		MapperFk23c::exRegs[i] = 0xFF;
+		
+	for (i=0; i < 4; ++i)
+		exRegs[i] = 0x00;
+		
+	MapperFk23c::unromChr = 0x0;
+	MapperFk23c::mode = 0;
+  
+	MMC3::Reset();	
+	Mmc3_UpdatePrg();
+	Mmc3_UpdateChr();
+}
+
+void MapperFk23ca::fk23c_UpdatePrg()
+{
+	uint32 bank  = (exRegs[1] & 0x1F);
+	uint32 block = (exRegs[1] & 0x60);
+	uint32 extra = (exRegs[3]&2);
+
+	if ((exRegs[0] & 0x7U) == 4)
+	{
+		SetPROM_32K_Bank( (bank + block) >> 1 );
+	}
+	else if ((exRegs[0] & 0x7U) == 3)
+	{
+		SetPROM_16K_Bank(4,(bank + block));
+		SetPROM_16K_Bank(6,(bank + block));
+	}
+	else
+	{
+		if (extra)
+		{
+			SetPROM_8K_Bank(6,exRegs[4]);
+			SetPROM_8K_Bank(7,exRegs[5]);
+		}
+	}
+}
