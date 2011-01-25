@@ -357,7 +357,10 @@ const BOARDINFO BoardInfo[]=
 	{ "SUBOR_999",					 SUBOR_999				  },
 	{ "SMART_GENIUS",				 SMART_GENIUS			  },
 	{ "FK23CA",						 FK23CA					  },
+	{ "BMC-FK23CA",					 BMC_FK23CA				  },
 	{ "FK23C",						 FK23C					  },
+	{ "BMC-Super24in1SC03",          BMC_SUPER_24IN1          },
+	{ "CHINA_ER_SAN2",				 CHINA_ER_SAN2			  },
 };
                                     
                                 

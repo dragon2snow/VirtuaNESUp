@@ -23,6 +23,8 @@ using namespace std;
 class	CDirectDraw
 {
 public:
+	unsigned char * font;
+
 	// パブリックメンバ変数
 	typedef	struct	tagDISPLAYMODE {
 		DWORD		dwWidth;
@@ -189,6 +191,7 @@ public:
 	}
 
 	void	Blt();
+	void	ViewChars( unsigned char * lpRdr );	//ﾊ鰔ｴｸ｡ｶｯｵﾄﾎﾄｱｾ
 	void	Flip();
 
 	// MMX

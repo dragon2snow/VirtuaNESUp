@@ -86,6 +86,12 @@ public:
 	void	GetContext( R6502& r )	{ r = R; }
 
 	void	SetClockProcess( BOOL bEnable ) { m_bClockProcess = bEnable; }
+
+	//µ˜ ‘”√
+	unsigned char DebugMemCPU (unsigned short Addr);
+	int	DecodeInstruction (unsigned short Addr, char *str1);
+
+
 protected:
 	NES*	nes;
 	APU*	apu;

@@ -30,6 +30,14 @@
 
 #include "unzip.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+int SevenZipUnCompress( char *fname, unsigned char ** ppBuf,size_t * lpdwSize);
+#ifdef __cplusplus
+}
+#endif
+
 #pragma	pack(1)
 #define	FNAME_MAX32	512
 
@@ -163,6 +171,7 @@ BOOL	ZlibUnZip( LPCSTR fname, LPBYTE* ppBuf, LPDWORD lpdwSize )
 	return	FALSE;
 }
 
+
 BOOL	UnCompress( LPCSTR fname, LPBYTE* ppBuf, LPDWORD lpdwSize )
 {
 HMODULE		hDLL;
@@ -176,6 +185,10 @@ INDIVIDUALINFO	idvinfo;
 			return	TRUE;
 		}
 //	}
+		if(SevenZipUnCompress( (char*)fname, ppBuf, (size_t *)lpdwSize ))
+		{
+			return	TRUE;
+		}
 
 	hDLL = NULL;
 	for( INT i = 0; pszArchiver[i]; i++ ) {

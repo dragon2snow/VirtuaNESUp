@@ -153,6 +153,43 @@ BYTE	smb2j::ReadLow ( WORD addr )
 	return (BYTE)(addr>>8);
 }
 
+Mapper8157::Mapper8157( NES* parent ) : Mapper(parent)
+{
+	mode = 0;
+}
+
+void	Mapper8157::Reset()
+{
+	if(mode==0)
+		mode = 0x100;
+	else
+		mode = 0;
+	trash=0;
+	Mapper8157::Write(0x8000,0);
+}
+
+void	Mapper8157::Write(WORD A, BYTE V )
+{
+	trash = (A & mode ) ? 0xFF : 0x00;
+	
+	SetPROM_16K_Bank(4,(A >> 2 & 0x18) | (A >> 2 & 0x7));
+	SetPROM_16K_Bank(6,(A >> 2 & 0x18) | ((A & 0x200) ? 0x7 : 0x0));
+	
+	if(A & 0x2)
+		SetVRAM_Mirror( VRAM_HMIRROR );
+	else
+		SetVRAM_Mirror( VRAM_VMIRROR);
+}
+
+
+
+/*
+void	Mapper8157::Read( WORD A, BYTE data )
+{
+	if(A>=0x8000)
+	CPU_MEM_BANK[A>>13][A&0x1FFF]=(A-0x8000) | trash;
+}*/
+
 
 
 

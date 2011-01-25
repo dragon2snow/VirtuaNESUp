@@ -96,6 +96,7 @@
 #include "Mapper100.h"
 #include "Mapper101.h"
 #include "Mapper107.h"
+#include "Mapper111.h"
 #include "Mapper113.h"
 #include "Mapper118.h"
 #include "Mapper119.h"
@@ -266,6 +267,7 @@
 #include "Mapper100.cpp"
 #include "Mapper101.cpp"
 #include "Mapper107.cpp"
+#include "Mapper111.cpp"
 #include "Mapper113.cpp"
 #include "Mapper118.cpp"
 #include "Mapper119.cpp"
@@ -364,6 +366,8 @@
 #include "Subor.cpp"
 #include "SmartGenius.cpp"
 
+
+extern BOOL g_bSan2;
 //////////////////////////////////////////////////////////////////////////
 // Mapper Factory
 //////////////////////////////////////////////////////////////////////////
@@ -388,12 +392,29 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			case BMC_FKC23C:
 			case FK23C:
 				return new MapperFk23c(parent);
+				//return new fceuMMC3(parent,FK23C);
 			case FK23CA:
 				return new MapperFk23ca(parent);
+			case BMC_FK23CA:
+				//return new MapperFk23ca(parent);
+				return new fceuMMC3(parent,FK23CA);
 
 			case SMART_GENIUS:
 				return new MapperSmartGenius(parent);
 				//return new MapperFk23c(parent);
+
+			case  BMC_8157:
+				return new Mapper8157(parent);
+
+			case CHINA_ER_SAN2://°ÔÍõµÄ´óÂ½
+				g_bSan2 = TRUE;
+				return new Mapper019(parent);
+
+			case SACHEN_STREETHEROES:
+				return new fceuMMC3(parent,SACHEN_STREETHEROES);
+			case BMC_SUPER_24IN1:
+				return new fceuMMC3(parent,BMC_SUPER_24IN1);
+
 		}
 		return NULL;
 	}
@@ -532,6 +553,8 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			return new Mapper101(parent);
 		case	107:
 			return new Mapper107(parent);
+		case	111:
+			return new Mapper111(parent);
 		case	113:
 			return new Mapper113(parent);
 		case	118:
@@ -553,6 +576,8 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			return new Mapper188(parent);
 		case	189:
 			return new Mapper189(parent);
+		case	216:
+			return new Mapper216(parent);
 		case	243:
 			return new Mapper243(parent);
 		case	0x100:
@@ -595,7 +620,11 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 		case	115:
 			return new Mapper115(parent);
 		case	116:
-			return new Mapper116(parent);
+			if( (PROM_16K_SIZE==8) &&(VROM_8K_SIZE==64) )
+			{
+				return new Mapper116(parent);
+			}
+			return new Mapper116B(parent);
 		case	117:
 			return new Mapper117(parent);
 		case	133:
@@ -622,10 +651,15 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			return new Mapper190(parent);
 		case	191:
 			return new Mapper191(parent);
+		case	192:
+			return new Mapper192(parent);
 		case	193:
 			return new Mapper193(parent);
 		case	194:
+			//return new fceuMMC3(parent,194);
 			return new Mapper194(parent);
+		case	195:
+			return new Mapper195(parent);
 		case	198:
 			return new Mapper198(parent);
 		case	199:

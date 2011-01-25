@@ -373,9 +373,13 @@ NES::~NES()
 	DEBUGOUT( "Ok.\n" );
 }
 
+extern INT	 g_UnfTVMode;
 void	NES::SetVideoMode( BOOL bMode )
 {	
-	bVideoMode = bMode;
+	if(g_UnfTVMode!=-1)
+		bVideoMode = g_UnfTVMode;
+	else
+		bVideoMode = bMode;
 	if( !bVideoMode ) {
 		nescfg = &NESCONFIG_NTSC;
 	} else {
@@ -562,6 +566,9 @@ INT	scanline = 0;
 	CheatCodeProcess();
 	//
 	NES_scanline = scanline;
+
+	//±¸·Ý£Ã£Ð£ÕÄÚ´æ
+	memcpy(CPU_BACKUP, CPU_MEM_BANK[0], 256);
 
 	if( RenderMethod != TILE_RENDER ) {
 		bZapper = FALSE;

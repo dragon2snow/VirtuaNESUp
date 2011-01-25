@@ -13,6 +13,7 @@
 #include "macro.h"
 
 // CPU メモリバンク
+extern  BYTE	CPU_BACKUP[256];
 extern	LPBYTE	CPU_MEM_BANK[8];	// 8K単位
 extern	BYTE	CPU_MEM_TYPE[8];
 extern	INT	CPU_MEM_PAGE[8];	// ステートセーブ用

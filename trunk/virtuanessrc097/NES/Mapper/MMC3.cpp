@@ -232,3 +232,507 @@ void	MMC3::LoadState( LPBYTE p )
 {
 	//Ã»Ð´ºÃ
 }
+
+
+
+
+
+// ----------------------------------------------------------------------
+// ------------------------- Generic MM3 Code ---------------------------
+// ----------------------------------------------------------------------
+
+void fceuMMC3::FixMMC3PRG(int V)
+{
+ if(V&0x40)
+ {
+  (this->*pwrap)(0xC000,DRegBuf[6]);
+  (this->*pwrap)(0x8000,~1);
+ }
+ else
+ {
+  (this->*pwrap)(0x8000,DRegBuf[6]);
+  (this->*pwrap)(0xC000,~1);
+ }
+   (this->*pwrap)(0xA000,DRegBuf[7]);
+   (this->*pwrap)(0xE000,~0);
+}
+
+void fceuMMC3::FixMMC3CHR(int V)
+{
+ int cbase=(V&0x80)<<5;
+
+ (this->*cwrap)((cbase^0x000),DRegBuf[0]&(~1));
+ (this->*cwrap)((cbase^0x400),DRegBuf[0]|1);
+ (this->*cwrap)((cbase^0x800),DRegBuf[1]&(~1));
+ (this->*cwrap)((cbase^0xC00),DRegBuf[1]|1);
+
+ (this->*cwrap)(cbase^0x1000,DRegBuf[2]);
+ (this->*cwrap)(cbase^0x1400,DRegBuf[3]);
+ (this->*cwrap)(cbase^0x1800,DRegBuf[4]);
+ (this->*cwrap)(cbase^0x1c00,DRegBuf[5]);
+}
+
+void	fceuMMC3::Reset()
+{
+ IRQCount=IRQLatch=IRQa=MMC3_cmd=0;
+	
+ mmc3opts = 0;
+ isRevB = 1;
+  
+  A001B=A000B=0;
+  //setmirror(1);
+
+ DRegBuf[0]=0;
+ DRegBuf[1]=2;
+ DRegBuf[2]=4;
+ DRegBuf[3]=5;
+ DRegBuf[4]=6;
+ DRegBuf[5]=7;
+ DRegBuf[6]=0;
+ DRegBuf[7]=1;
+ 
+ EXPREGS[4]=0;
+ 
+ unromchr=dipswitch=0;
+ 
+ switch(iMapper)
+ {
+	case 194: Reset194(); break;
+	case SACHEN_STREETHEROES: MSHReset();break;
+	case BMC_SUPER_24IN1: Super24Reset();break;
+	case FK23C: BMCFK23CReset();break;
+	case FK23CA: BMCFK23CAReset();break;
+ }
+
+ FixMMC3PRG(0);
+ FixMMC3CHR(0);
+}
+
+
+void fceuMMC3::MMC3_CMDWrite(uint32 A, uint8 V)
+{
+ switch(A&0xE001)
+ {
+  case 0x8000:
+       if((V&0x40) != (MMC3_cmd&0x40))
+       {
+          FixMMC3PRG(V);
+       }
+       if((V&0x80) != (MMC3_cmd&0x80))
+          FixMMC3CHR(V);
+       MMC3_cmd = V;
+       break;
+  case 0x8001:
+       {
+        int cbase=(MMC3_cmd&0x80)<<5;
+        DRegBuf[MMC3_cmd&0x7]=V;
+        switch(MMC3_cmd&0x07)
+        {
+         case 0: (this->*cwrap)((cbase^0x000),V&(~1));
+                 (this->*cwrap)((cbase^0x400),V|1);
+                 break;
+         case 1: (this->*cwrap)((cbase^0x800),V&(~1));
+                 (this->*cwrap)((cbase^0xC00),V|1);
+                 break;
+         case 2: (this->*cwrap)(cbase^0x1000,V);
+                 break;
+         case 3: (this->*cwrap)(cbase^0x1400,V);
+                 break;
+         case 4: (this->*cwrap)(cbase^0x1800,V);
+                 break;
+         case 5: (this->*cwrap)(cbase^0x1C00,V);
+                 break;
+         case 6:
+                 if(MMC3_cmd&0x40)
+                    (this->*pwrap)(0xC000,V);
+                 else
+                    (this->*pwrap)(0x8000,V);
+                 break;
+         case 7:
+                 (this->*pwrap)(0xA000,V);
+                 break;
+        }
+       }
+       break;
+  case 0xA000:
+       if(mwrap) (this->*mwrap)(V);
+       break;
+  case 0xA001:
+       A001B=V;
+       break;
+ }
+}
+
+void fceuMMC3::MMC3_IRQWrite(uint32 A, uint8 V)
+{
+ switch(A&0xE001)
+ {
+  case 0xC000:IRQLatch=V;break;
+  case 0xC001:IRQReload=1;break;
+  case 0xE000:nes->cpu->ClrIRQ( IRQ_MAPPER );IRQa=0;break;
+  case 0xE001:IRQa=1;break;
+ }
+}
+
+
+void fceuMMC3::ClockMMC3Counter(void)
+{
+ int count = IRQCount;
+ if(!count || IRQReload)
+ {
+    IRQCount = IRQLatch;
+    IRQReload = 0;
+ }
+ else
+    IRQCount--;
+ if((count|isRevB) && !IRQCount)
+ {
+    if(IRQa)
+    {
+		nes->cpu->SetIRQ( IRQ_MAPPER );
+    }
+ }
+}
+
+void fceuMMC3::GENCWRAP(uint32 A, uint8 V)
+{
+   SetVROM_1K_Bank(A>>10,V);    // Business Wars NEEDS THIS for 8K CHR-RAM
+}
+
+void fceuMMC3::GENPWRAP(uint32 A, uint8 V)
+{
+	SetPROM_8K_Bank(A>>13,V&0x3F);
+}
+
+void fceuMMC3::GENMWRAP(uint8 V)
+{
+ A000B=V;
+ if( !nes->rom->Is4SCREEN() ) 
+	SetVRAM_Mirror((V&1)^1);
+}
+
+void fceuMMC3::GENNOMWRAP(uint8 V)
+{
+ A000B=V;
+}
+
+void	fceuMMC3::Write( WORD A, BYTE V ){	return (this->*pWrite)(A,V);}
+
+void	fceuMMC3::Mmc3Write( WORD A, BYTE V )
+{
+	if(A<0xC000)
+		MMC3_CMDWrite(A,V);
+	else
+		MMC3_IRQWrite(A,V);
+}
+
+BYTE	fceuMMC3::ReadLow( WORD addr ){	return (this->*pReadLow)(addr);}
+BYTE	fceuMMC3::Mmc3ReadLow( WORD addr )
+{
+	if( addr >= 0x5000 && addr <= 0x5FFF ) {
+		return	XRAM[addr-0x4000];
+	}else{
+		return	Mapper::ReadLow( addr );
+	}
+}
+
+void	fceuMMC3::WriteLow( WORD addr, BYTE data ){	(this->*pWriteLow)(addr,data);}
+
+void	fceuMMC3::Mmc3WriteLow( WORD addr, BYTE data )
+{
+	if( addr >= 0x5000 && addr <= 0x5FFF ) {
+		XRAM[addr-0x4000] = data;
+	} else {
+		Mapper::WriteLow( addr, data );
+	}
+}
+
+void	fceuMMC3::Read( WORD A, BYTE V )
+{
+	(this->*pRead)(A,V);
+}
+
+void	fceuMMC3::Mmc3Read( WORD addr, BYTE data )
+{
+}
+
+void	fceuMMC3::HSync( INT scanline )
+{
+	if( (scanline >= 0 && scanline <= 239) )
+	{
+		if(nes->ppu->IsDispON())
+		ClockMMC3Counter();
+	}
+}
+
+
+fceuMMC3::fceuMMC3( NES* parent,int imap):Mapper(parent)
+{
+ iMapper = imap;
+ pwrap=&fceuMMC3::GENPWRAP;
+ cwrap=&fceuMMC3::GENCWRAP;
+ mwrap=&fceuMMC3::GENMWRAP;
+
+ pWrite   =&fceuMMC3::Mmc3Write;
+ pWriteLow=&fceuMMC3::Mmc3WriteLow;
+ pReadLow =&fceuMMC3::Mmc3ReadLow;
+ pRead    =&fceuMMC3::Mmc3Read;
+
+ tekker = 0;
+}
+
+
+//mapper 194
+void fceuMMC3::M194CW(uint32 A, uint8 V)
+{
+  if(V<=1) //Dai-2-Ji - Super Robot Taisen (As).nes
+    SetCRAM_1K_Bank(A>>10,V);
+  else
+    SetVROM_1K_Bank(A>>10,V);
+}
+void fceuMMC3::Reset194()
+{ 
+	cwrap=&fceuMMC3::M194CW;
+}
+
+
+//SACHEN_STREETHEROES
+void fceuMMC3::MSHCW(uint32 A, uint8 V)
+{
+  if(EXPREGS[0]&0x40)
+    SetCRAM_8K_Bank(0);
+  else
+  {
+    if(A<0x800)
+      SetVROM_1K_Bank(A>>10,V|((EXPREGS[0]&8)<<5));
+    else if(A<0x1000)
+      SetVROM_1K_Bank(A>>10,V|((EXPREGS[0]&4)<<6));
+    else if(A<0x1800)
+      SetVROM_1K_Bank(A>>10,V|((EXPREGS[0]&1)<<8));
+    else
+      SetVROM_1K_Bank(A>>10,V|((EXPREGS[0]&2)<<7));
+  }
+}
+
+
+void fceuMMC3::MSHWrite(uint16 A, uint8 V)
+{
+	if(A=0x4100)
+	{
+	  EXPREGS[0]=V;
+	  FixMMC3CHR(MMC3_cmd);
+	}
+	else
+		Mapper::WriteLow( A, V );
+}
+
+
+BYTE fceuMMC3::MSHRead(uint16 A)
+{
+	if(A=0x4100)
+	{
+		return(tekker);
+	}
+	else
+	return	Mapper::ReadLow( A );
+}
+
+void fceuMMC3::MSHMWRAP(uint8 V)
+{
+ A000B=V;
+ if( !nes->rom->Is4SCREEN() ) 
+	SetVRAM_Mirror(VRAM_MIRROR4);
+}
+
+void fceuMMC3::MSHReset()
+{
+  //MMC3RegReset();
+  cwrap=&fceuMMC3::MSHCW;
+  pWriteLow=&fceuMMC3::MSHWrite;
+  pReadLow =&fceuMMC3::MSHRead;
+  mwrap    =&fceuMMC3::MSHMWRAP;
+  tekker^=0xFF; 
+}
+
+
+//24in1
+void fceuMMC3::Super24PW(uint32 A, uint8 V)
+{
+  const int masko8[8]={63,31,15,1,3,0,0,0};
+  uint32 NV=V&masko8[EXPREGS[0]&7];
+  NV|=(EXPREGS[1]<<1);
+  //setprg8r((NV>>6)&0xF,A,NV);
+  SetPROM_8K_Bank(A>>13,NV);
+}
+void fceuMMC3::Super24CW(uint32 A, uint8 V)
+{
+  if(EXPREGS[0]&0x20)
+    SetCRAM_1K_Bank(A>>10,V);
+  else
+  {
+    uint32 NV=V|(EXPREGS[2]<<3);
+    //setchr1r((NV>>9)&0xF,A,NV);
+	SetVROM_1K_Bank(A>>10,NV);
+  }
+}
+void fceuMMC3::Super24Write(uint16 A, uint8 V)
+{
+  switch(A)
+  {
+    case 0x5FF0: EXPREGS[0]=V;
+                 FixMMC3PRG(MMC3_cmd);
+                 FixMMC3CHR(MMC3_cmd);
+                 break;
+    case 0x5FF1: EXPREGS[1]=V;
+                 FixMMC3PRG(MMC3_cmd);
+                 break;
+    case 0x5FF2: EXPREGS[2]=V;
+                 FixMMC3CHR(MMC3_cmd);
+                 break;
+  }
+  if(A<0x5000)
+  {
+	  Mapper::WriteLow(A,V);
+	  }
+}
+
+void fceuMMC3::Super24Reset()
+{
+  EXPREGS[0]=0x24;
+  EXPREGS[1]=159;
+  EXPREGS[2]=0;
+
+  cwrap=&fceuMMC3::Super24CW;
+  pwrap=&fceuMMC3::Super24PW;
+  pWriteLow =&fceuMMC3::Super24Write;
+}
+
+
+//fk23c
+void fceuMMC3::BMCFK23CCW(uint32 A, uint8 V)
+{
+  if(EXPREGS[0]&0x40)
+    SetVROM_8K_Bank(EXPREGS[2]|unromchr);
+  else
+  {
+    uint16 base=(EXPREGS[2]&0x7F)<<3;
+    SetVROM_1K_Bank(A>>10,V|base);
+    if(EXPREGS[3]&2)
+    {
+      SetVROM_1K_Bank(0x0400>>10,EXPREGS[6]|base);
+      SetVROM_1K_Bank(0x0C00>>10,EXPREGS[7]|base);
+    }
+  }
+}
+void fceuMMC3::BMCFK23CPW(uint32 A, uint8 V)
+{
+  uint32 bank = (EXPREGS[1] & 0x1F);
+  uint32 block = (EXPREGS[1] & 0x60);
+  uint32 extra = (EXPREGS[3]&2);
+  switch(EXPREGS[0]&7)
+  {
+   case 0: SetPROM_8K_Bank(A>>13, (block << 1) | (V & 0x3F));
+           if(extra)
+           {
+            SetPROM_8K_Bank(0xC000>>13,EXPREGS[4]);
+            SetPROM_8K_Bank(0xE000>>13,EXPREGS[5]);
+           }
+           break;
+   case 1: SetPROM_8K_Bank(A>>13, ((EXPREGS[1] & 0x70) << 1) | (V & 0x1F));
+           if(extra)
+           {
+            SetPROM_8K_Bank(0xC000>>13,EXPREGS[4]);
+            SetPROM_8K_Bank(0xE000>>13,EXPREGS[5]);
+           }
+           break;
+   case 2: SetPROM_8K_Bank(A>>13, ((EXPREGS[1] & 0x78) << 1) | (V & 0x0F));
+           if(extra)
+           {
+            SetPROM_8K_Bank(0xC000>>13,EXPREGS[4]);
+            SetPROM_8K_Bank(0xE000>>13,EXPREGS[5]);
+           }
+           break;  
+   case 3: SetPROM_16K_Bank(0x8000>>13,(bank + block));
+           SetPROM_16K_Bank(0xC000>>13,(bank + block));
+           break;
+   case 4: SetPROM_32K_Bank((bank + block) >> 1);
+           break;
+  }
+}
+
+
+void fceuMMC3::BMCFK23CHiWrite(uint16 A, uint8 V)
+{
+  if(EXPREGS[0]&0x40)
+  {
+    if(EXPREGS[0]&0x30)
+      unromchr=0;
+    else
+    {
+      unromchr=V&3;
+      FixMMC3CHR(MMC3_cmd);
+    }
+  }
+  else
+  {
+    if((A==0x8001)&&(EXPREGS[3]&2&&MMC3_cmd&8))
+    {
+      EXPREGS[4|(MMC3_cmd&3)]=V;
+      FixMMC3PRG(MMC3_cmd);
+      FixMMC3CHR(MMC3_cmd);
+    }
+    else    
+      if(A<0xC000)
+        MMC3_CMDWrite(A,V);
+      else
+        MMC3_IRQWrite(A,V);
+  }
+}
+
+void fceuMMC3::BMCFK23CWrite(uint16 A, uint8 V)
+{
+	if(A&(1<<(dipswitch+4)))
+  {
+    EXPREGS[A&3]=V;
+    FixMMC3PRG(MMC3_cmd);
+    FixMMC3CHR(MMC3_cmd);
+  }
+}
+
+void fceuMMC3::BMCFK23CReset()
+{	
+  cwrap =&fceuMMC3::BMCFK23CCW;
+  pwrap =&fceuMMC3::BMCFK23CPW;
+  pWrite=&fceuMMC3::BMCFK23CHiWrite;
+  pWriteLow=&fceuMMC3::BMCFK23CWrite;
+
+  /*
+  EXPREGS[0]=4;
+  EXPREGS[1]=0xFF;
+  EXPREGS[2]=EXPREGS[3]=0;
+  EXPREGS[4]=EXPREGS[5]=EXPREGS[6]=EXPREGS[7]=0xFF;*/
+
+  dipswitch++;
+  dipswitch&=7;
+  EXPREGS[0]=EXPREGS[1]=EXPREGS[2]=EXPREGS[3]=0;
+  EXPREGS[4]=EXPREGS[5]=EXPREGS[6]=EXPREGS[7]=0xFF;
+
+  FixMMC3PRG(MMC3_cmd);
+  FixMMC3CHR(MMC3_cmd);
+}
+
+void fceuMMC3::BMCFK23CAReset()
+{
+  cwrap =&fceuMMC3::BMCFK23CCW;
+  pwrap =&fceuMMC3::BMCFK23CPW;
+  pWrite=&fceuMMC3::BMCFK23CHiWrite;
+  pWriteLow=&fceuMMC3::BMCFK23CWrite;
+
+  dipswitch++;
+  dipswitch&=7;
+  EXPREGS[0]=EXPREGS[1]=EXPREGS[2]=EXPREGS[3]=0;
+  EXPREGS[4]=EXPREGS[5]=EXPREGS[6]=EXPREGS[7]=0xFF;
+ 
+  FixMMC3PRG(MMC3_cmd);
+  FixMMC3CHR(MMC3_cmd);
+}

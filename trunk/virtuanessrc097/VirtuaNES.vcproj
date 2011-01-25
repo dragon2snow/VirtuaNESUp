@@ -10112,6 +10112,46 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\NES\Mapper\Mapper111.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\NES\Mapper\Mapper111.h"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath="NES\Mapper\Mapper112.cpp"
 					>
 					<FileConfiguration
@@ -11402,12 +11442,28 @@
 							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\NES\Mapper\Mapper162.h"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -12679,12 +12735,28 @@
 							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\NES\Mapper\Mapper199.h"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -17159,6 +17231,138 @@
 			</File>
 			<File
 				RelativePath="zlib\zlib.lib"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="7Zip"
+			>
+			<File
+				RelativePath=".\7z\7z.h"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\7zAlloc.c"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="1"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\7z\7zAlloc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\7zBuf.c"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\7zBuf.h"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\7zCrc.c"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\7zCrc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\7zCrcOpt.c"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\7zDec.c"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\7zFile.c"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\7zFile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\7zIn.c"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\7zMain.c"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\7zStream.c"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\Bcj2.c"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\Bcj2.h"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\Bra.c"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\Bra.h"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\Bra86.c"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\CpuArch.c"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\CpuArch.h"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\Lzma2Dec.c"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\Lzma2Dec.h"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\LzmaDec.c"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\LzmaDec.h"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\Ppmd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\Ppmd7.c"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\Ppmd7.h"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\Ppmd7Dec.c"
+				>
+			</File>
+			<File
+				RelativePath=".\7z\Types.h"
 				>
 			</File>
 		</Filter>

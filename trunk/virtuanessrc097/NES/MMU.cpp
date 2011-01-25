@@ -14,6 +14,7 @@
 #include "mmu.h"
 
 // CPU メモリバンク
+BYTE	CPU_BACKUP[256];
 LPBYTE	CPU_MEM_BANK[8];	// 8K単位
 BYTE	CPU_MEM_TYPE[8];
 INT	CPU_MEM_PAGE[8];	// ステートセーブ用

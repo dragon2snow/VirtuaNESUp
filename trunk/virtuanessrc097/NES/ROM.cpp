@@ -33,6 +33,10 @@
 
 #include "unif.h"
 
+BOOL g_bSan2;
+INT	 g_UnfTVMode = -1;
+unsigned char pSan2Font[64*1024];//定义64K的字库空间
+
 #define MKID(a) ((unsigned long) \
 	(((a) >> 24) & 0x000000FF) | \
 	(((a) >>  8) & 0x0000FF00) | \
@@ -43,6 +47,7 @@
 //
 ROM::ROM( const char* fname )
 {
+g_bSan2 = FALSE;
 FILE	*fp = NULL;
 LPBYTE	temp = NULL;
 LPBYTE	bios = NULL;
@@ -58,6 +63,7 @@ LONG	FileSize;
 	
 	board = 0;
 	bUnif = FALSE;
+	g_UnfTVMode = -1;
 
 	lpPRG = lpCHR = lpTrainer = lpDiskBios = lpDisk = NULL;
 
@@ -215,6 +221,17 @@ LONG	FileSize;
 						//fl.title = name;
 						ipos+=BlockLen;	break;
 
+					case MKID('TVCI')://电视制式
+						g_UnfTVMode = pUnif[ipos];
+						ipos+=BlockLen;	break;
+
+					case MKID('BATR')://使用电池记忆
+						header.control1 |=2;
+						ipos+=BlockLen;	break;						
+
+					case MKID('FONT')://字库
+						memcpy( pSan2Font, &pUnif[ipos], BlockLen>65536?65536:BlockLen);
+						ipos+=BlockLen;	break;
 						
 					case MKID('MIRR'):
 						if (pUnif[ipos]==0)
@@ -323,7 +340,8 @@ LONG	FileSize;
 				CHRoffset += 512;
 			}
 
-			if( PRGsize <= 0 || (PRGsize+CHRsize) > FileSize ) {
+			//if( PRGsize <= 0 || (PRGsize+CHRsize) > FileSize ) {
+			if( PRGsize <= 0 ) {
 				// NES僿僢僟偑堎忢偱偡
 				throw	CApp::GetErrorString( IDS_ERROR_INVALIDNESHEADER );
 			}

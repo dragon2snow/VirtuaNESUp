@@ -35,3 +35,18 @@ protected:
 	WORD IRQCount;
 private:
 };
+
+class	Mapper8157 : public Mapper
+{
+public:
+	Mapper8157( NES* parent );
+	
+	void	Reset();
+	void	Write( WORD addr, BYTE data );
+	//void	Read( WORD addr, BYTE data );
+	
+protected:
+	WORD mode;
+	BYTE trash;
+private:
+};
