@@ -1396,8 +1396,8 @@ DEBUGOUT( "Path:%s\n", Path.c_str() );
 					header.control1 = control1;
 					header.control2 = control2;
 
-					for( INT i = 0; i < 8; i++ )
-						header.reserved[i] = 0;
+					//for( INT i = 0; i < 8; i++ )
+					//	header.reserved[i] = 0;
 
 					LPBYTE	temp = NULL;
 					LONG	size;

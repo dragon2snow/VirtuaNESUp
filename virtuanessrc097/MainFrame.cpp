@@ -1002,9 +1002,9 @@ WNDCMD	CMainFrame::OnFileOpen( WNDCMDPARAM )
 	ofn.hwndOwner       = m_hWnd;
 	ofn.lpstrFile       = szFile;
 	ofn.nMaxFile        = sizeof(szFile);
-	ofn.lpstrFilter     = "All Support Types\0*.nes;*.fds;*.unf;*.nsf;*.lzh;*.zip;*.rar;*.cab\0"
+	ofn.lpstrFilter     = "All Support Types\0*.nes;*.fds;*.unf;*.nsf;*.lzh;*.zip;*.rar;*.cab;*.7z\0"
 			      "NES ROM (*.nes)\0*.nes;*.unf\0Disk Image (*.fds)\0*.fds\0"
-			      "NES Music File (*.nsf)\0*.nsf\0Archive File\0*.lzh;*.zip;*.rar;*.cab\0";
+			      "NES Music File (*.nsf)\0*.nsf\0Archive File\0*.lzh;*.zip;*.rar;*.cab;*.7z\0";
 	ofn.nFilterIndex    = 1;
 	ofn.Flags           = OFN_READONLY|OFN_HIDEREADONLY|OFN_EXPLORER|OFN_PATHMUSTEXIST;
 	ofn.lpstrInitialDir = pathstr.c_str();
@@ -1180,9 +1180,9 @@ WNDCMD	CMainFrame::OnRecentOpenPath( WNDCMDPARAM )
 	ofn.hwndOwner       = m_hWnd;
 	ofn.lpstrFile       = szFile;
 	ofn.nMaxFile        = sizeof(szFile);
-	ofn.lpstrFilter     = "All Support Types\0*.nes;*.unf;*.fds;*.nsf;*.lzh;*.zip;*.rar;*.cab\0"
+	ofn.lpstrFilter     = "All Support Types\0*.nes;*.unf;*.fds;*.nsf;*.lzh;*.zip;*.rar;*.cab;*.7z\0"
 			      "NES ROM (*.nes)\0*.nes;*.unf\0Disk Image (*.fds)\0*.fds\0"
-			      "NES Music File (*.nsf)\0*.nsf\0Archive File\0*.lzh;*.zip;*.rar;*.cab\0";
+			      "NES Music File (*.nsf)\0*.nsf\0Archive File\0*.lzh;*.zip;*.rar;*.cab;*.7z\0";
 	ofn.nFilterIndex    = 1;
 	ofn.Flags           = OFN_READONLY|OFN_HIDEREADONLY|OFN_EXPLORER|OFN_PATHMUSTEXIST;
 	ofn.lpstrInitialDir = CRecent::GetPath( (INT)uID-ID_MRU_PATH0 );
