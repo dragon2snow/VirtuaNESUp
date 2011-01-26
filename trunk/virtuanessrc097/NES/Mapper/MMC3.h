@@ -142,6 +142,13 @@ public:
 	void M194CW(uint32 A, uint8 V);
 	void Reset194();
 
+	//mapper 199
+	void Reset199();	
+	void M199PW(uint32 A, uint8 V);
+	void M199CW(uint32 A, uint8 V);
+	void M199MW(uint8 V);
+	void M199Write(uint16 A, uint8 V);
+
 	//SACHEN_STREETHEROES
 	uint8 tekker;
 	void MSHCW(uint32 A, uint8 V);
