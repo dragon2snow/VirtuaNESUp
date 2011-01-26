@@ -352,6 +352,8 @@ LONG	FileSize;
 				throw	CApp::GetErrorString( IDS_ERROR_OUTOFMEMORY );
 			}
 
+			if(PRGsize>(FileSize-PRGoffset))
+				PRGsize = FileSize-PRGoffset;
 			::memcpy( lpPRG, temp+PRGoffset, PRGsize );
 
 			// CHR BANK
