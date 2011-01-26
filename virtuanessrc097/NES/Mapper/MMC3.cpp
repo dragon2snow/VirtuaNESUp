@@ -298,6 +298,7 @@ void	fceuMMC3::Reset()
  switch(iMapper)
  {
 	case 194: Reset194(); break;
+	case 199: Reset199(); break;
 	case SACHEN_STREETHEROES: MSHReset();break;
 	case BMC_SUPER_24IN1: Super24Reset();break;
 	case FK23C: BMCFK23CReset();break;
@@ -496,6 +497,63 @@ void fceuMMC3::Reset194()
 }
 
 
+//mapper 199
+void fceuMMC3::Reset199()
+{
+  EXPREGS[0]=~1;
+  EXPREGS[1]=~0;
+  EXPREGS[2]=1;
+  EXPREGS[3]=3;
+
+  pWrite=&fceuMMC3::M199Write;
+
+  cwrap=&fceuMMC3::M199CW;
+  pwrap=&fceuMMC3::M199PW;
+  mwrap=&fceuMMC3::M199MW;
+}
+void fceuMMC3::M199PW(uint32 A, uint8 V)
+{
+  SetPROM_8K_Bank(A>>13,V);
+  SetPROM_8K_Bank(0xC000>>13,EXPREGS[0]);
+  SetPROM_8K_Bank(0xE000>>13,EXPREGS[1]);
+}
+void fceuMMC3::M199CW(uint32 A, uint8 V)
+{
+#define CHECK_C_V(X,Y,Z) if(X) SetCRAM_1K_Bank(Y,Z); else SetVROM_1K_Bank(Y,Z);
+
+	CHECK_C_V((V<8)?0x10:0x00,A>>10,V)
+
+  CHECK_C_V((DRegBuf[0]<8)?0x10:0x00,0x0000>>10,DRegBuf[0])
+  CHECK_C_V((EXPREGS[2]<8)?0x10:0x00,0x0400>>10,EXPREGS[2])
+  CHECK_C_V((DRegBuf[1]<8)?0x10:0x00,0x0800>>10,DRegBuf[1])
+  CHECK_C_V((EXPREGS[3]<8)?0x10:0x00,0x0c00>>10,EXPREGS[3])
+}
+void fceuMMC3::M199MW(uint8 V)
+{
+	if( !nes->rom->Is4SCREEN() ) 
+	switch(V&3)
+	{
+		case 0: SetVRAM_Mirror(VRAM_VMIRROR); break;
+		case 1: SetVRAM_Mirror(VRAM_HMIRROR); break;
+		case 2: SetVRAM_Mirror(VRAM_MIRROR4L); break;
+		case 3: SetVRAM_Mirror(VRAM_MIRROR4H); break;
+	}
+}
+void fceuMMC3::M199Write(uint16 A, uint8 V)
+{
+  if((A==0x8001)&&(MMC3_cmd&8))
+  {
+    EXPREGS[MMC3_cmd&3]=V;
+    FixMMC3PRG(MMC3_cmd);
+    FixMMC3CHR(MMC3_cmd);
+  }
+  else    
+    if(A<0xC000)
+      MMC3_CMDWrite(A,V);
+    else
+      MMC3_IRQWrite(A,V);
+}
+
 //SACHEN_STREETHEROES
 void fceuMMC3::MSHCW(uint32 A, uint8 V)
 {
@@ -514,7 +572,6 @@ void fceuMMC3::MSHCW(uint32 A, uint8 V)
   }
 }
 
-
 void fceuMMC3::MSHWrite(uint16 A, uint8 V)
 {
 	if(A=0x4100)
@@ -525,7 +582,6 @@ void fceuMMC3::MSHWrite(uint16 A, uint8 V)
 	else
 		Mapper::WriteLow( A, V );
 }
-
 
 BYTE fceuMMC3::MSHRead(uint16 A)
 {
