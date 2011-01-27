@@ -182,14 +182,35 @@ void	Mapper8157::Write(WORD A, BYTE V )
 }
 
 
-
-/*
-void	Mapper8157::Read( WORD A, BYTE data )
+MapperT262::MapperT262( NES* parent ):Mapper(parent)
 {
-	if(A>=0x8000)
-	CPU_MEM_BANK[A>>13][A&0x1FFF]=(A-0x8000) | trash;
-}*/
+}
 
+void	MapperT262::Reset()
+{
+  SetVROM_8K_Bank(0);  
+  busy=0;
+  addrreg=0;
+  datareg=0;
 
-
+  uint16 base=((addrreg&0x60)>>2)|((addrreg&0x100)>>3);  
+  SetPROM_16K_Bank(0x8000>>13,(datareg&7)|base);
+  SetPROM_16K_Bank(0xC000>>13,7|base);
+  SetVRAM_Mirror(((addrreg&2)>>1)^1);
+}
+void	MapperT262::Write( WORD A, BYTE V )
+{
+  if(busy||(A==0x8000))
+    datareg=V;
+  else
+  {
+    addrreg=A;
+    busy=1;
+  }
+  
+  uint16 base=((addrreg&0x60)>>2)|((addrreg&0x100)>>3);  
+  SetPROM_16K_Bank(0x8000>>13,(datareg&7)|base);
+  SetPROM_16K_Bank(0xC000>>13,7|base);
+  SetVRAM_Mirror(((addrreg&2)>>1)^1);
+}
 

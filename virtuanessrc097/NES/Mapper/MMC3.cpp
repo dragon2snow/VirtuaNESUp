@@ -280,6 +280,7 @@ void	fceuMMC3::Reset()
  isRevB = 1;
   
   A001B=A000B=0;
+
   //setmirror(1);
 
  DRegBuf[0]=0;
@@ -297,8 +298,14 @@ void	fceuMMC3::Reset()
  
  switch(iMapper)
  {
+	case  47: Reset47 (); break;
+	case  49: Reset49 (); break;
+	case  52: Reset52 (); break;
+	case 121: Reset121(); break;
 	case 194: Reset194(); break;
 	case 199: Reset199(); break;
+	case 205: Reset205(); break;
+	case 217: Reset217(); break;
 	case SACHEN_STREETHEROES: MSHReset();break;
 	case BMC_SUPER_24IN1: Super24Reset();break;
 	case FK23C: BMCFK23CReset();break;
@@ -483,6 +490,225 @@ fceuMMC3::fceuMMC3( NES* parent,int imap):Mapper(parent)
 }
 
 
+
+//mapper 47
+void fceuMMC3::Reset47()
+{
+ EXPREGS[0]=0;
+ pwrap=&fceuMMC3::M47PW;
+ cwrap=&fceuMMC3::M47CW;
+ pWriteLow = &fceuMMC3::M47Write;
+}
+void fceuMMC3::M47PW(uint32 A, uint8 V)
+{
+ V&=0xF;
+ V|=EXPREGS[0]<<4;
+ SetPROM_8K_Bank(A>>13,V);
+}
+void fceuMMC3::M47CW(uint32 A, uint8 V)
+{
+ uint32 NV=V;
+ NV&=0x7F;
+ NV|=EXPREGS[0]<<7;
+ SetVROM_1K_Bank(A>>10,NV);
+}
+void fceuMMC3::M47Write(uint16 A, uint8 V)
+{
+	if(A>=0x6000)
+	{
+	 EXPREGS[0]=V&1;
+	 FixMMC3PRG(MMC3_cmd);
+	 FixMMC3CHR(MMC3_cmd);
+	}else
+		fceuMMC3::Mmc3WriteLow(A,V);
+}
+
+//mapper 49
+void fceuMMC3::Reset49()
+{
+ EXPREGS[0]=0;
+ cwrap=&fceuMMC3::M49CW;
+ pwrap=&fceuMMC3::M49PW;
+
+ pWriteLow = &fceuMMC3::M49Write;
+ //SetWriteHandler(0x6000,0x7FFF,M49Write);
+ //SetReadHandler(0x6000,0x7FFF,0);
+}
+void fceuMMC3::M49PW(uint32 A, uint8 V)
+{
+ if(EXPREGS[0]&1)
+ {
+  V&=0xF;
+  V|=(EXPREGS[0]&0xC0)>>2;
+  SetPROM_8K_Bank(A>>13,V);
+ }
+ else
+  SetPROM_32K_Bank((EXPREGS[0]>>4)&3);
+}
+void fceuMMC3::M49CW(uint32 A, uint8 V)
+{
+ uint32 NV=V;
+ NV&=0x7F;
+ NV|=(EXPREGS[0]&0xC0)<<1;
+ SetVROM_1K_Bank(A>>10,NV);
+}
+void fceuMMC3::M49Write(uint16 A, uint8 V)
+{
+	if(A<0x6000)
+	{
+		fceuMMC3::Mmc3WriteLow(A,V);
+	}
+	else
+ if(A001B&0x80)
+ {
+  EXPREGS[0]=V;
+  FixMMC3PRG(MMC3_cmd);
+  FixMMC3CHR(MMC3_cmd);
+ }
+}
+
+//mapper 52
+void fceuMMC3::Reset52()
+{
+ EXPREGS[0]=EXPREGS[1]=0;
+ cwrap= &fceuMMC3::M52CW;
+ pwrap= &fceuMMC3::M52PW;
+ pWriteLow = &fceuMMC3::M52Write;
+ pReadLow = &fceuMMC3::M52ReadLow;
+}
+void fceuMMC3::M52PW(uint32 A, uint8 V)
+{
+ uint32 NV=V;
+ NV&=0x1F^((EXPREGS[0]&8)<<1);
+ NV|=((EXPREGS[0]&6)|((EXPREGS[0]>>3)&EXPREGS[0]&1))<<4;
+ SetPROM_8K_Bank(A>>13,NV);
+}
+void fceuMMC3::M52CW(uint32 A, uint8 V)
+{
+ uint32 NV=V;
+ NV&=0xFF^((EXPREGS[0]&0x40)<<1);
+ NV|=(((EXPREGS[0]>>3)&4)|((EXPREGS[0]>>1)&2)|((EXPREGS[0]>>6)&(EXPREGS[0]>>4)&1))<<7;
+ SetVROM_1K_Bank(A>>10,NV);
+}
+
+BYTE fceuMMC3::M52ReadLow( WORD A )
+{
+  return XRAM[A-0x6000];
+}
+
+void fceuMMC3::M52Write(uint16 A, uint8 V)
+{
+ if(EXPREGS[1])
+ {
+  //XRAM[A-0x6000]=V;
+  return;
+ }
+ EXPREGS[1]=1;
+ EXPREGS[0]=V;
+ FixMMC3PRG(MMC3_cmd);
+ FixMMC3CHR(MMC3_cmd);
+}
+
+//mapper 121
+void fceuMMC3::Reset121()
+{
+  EXPREGS[5] = 0;
+  pwrap=&fceuMMC3::M121PW;
+  cwrap=&fceuMMC3::M121CW;
+  
+  pWrite    = &fceuMMC3::M121Write;
+  pWriteLow = &fceuMMC3::M121LoWrite;
+  pReadLow  = &fceuMMC3::M121Read;
+}
+
+void fceuMMC3::M121Sync()
+{
+  switch(EXPREGS[5]&0x3F)
+  {
+    case 0x20: EXPREGS[7] = 1; EXPREGS[0]=EXPREGS[6]; break;
+    case 0x29: EXPREGS[7] = 1; EXPREGS[0]=EXPREGS[6]; break;
+    case 0x26: EXPREGS[7] = 0; EXPREGS[0]=EXPREGS[6]; break;
+    case 0x2B: EXPREGS[7] = 1; EXPREGS[0]=EXPREGS[6]; break;
+    case 0x2C: EXPREGS[7] = 1; if(EXPREGS[6]) EXPREGS[0]=EXPREGS[6]; break;
+    case 0x3F: EXPREGS[7] = 1; EXPREGS[0]=EXPREGS[6]; break;
+    case 0x28: EXPREGS[7] = 0; EXPREGS[1]=EXPREGS[6]; break;
+    case 0x2A: EXPREGS[7] = 0; EXPREGS[2]=EXPREGS[6]; break;
+    case 0x2F: break;
+    default:   EXPREGS[5] = 0; break;
+  }
+}
+
+void fceuMMC3::M121CW(uint32 A, uint8 V)
+{
+  if((A&0x1000)==((MMC3_cmd&0x80)<<5))
+    SetVROM_1K_Bank(A>>10,V|0x100);
+  else
+    SetVROM_1K_Bank(A>>10,V);
+}
+
+
+void fceuMMC3::M121PW(uint32 A, uint8 V)
+{
+  if(EXPREGS[5]&0x3F)
+  {
+    SetPROM_8K_Bank(A>>13,V&0x3F);
+    SetPROM_8K_Bank(0xE000>>13,EXPREGS[0]);
+    SetPROM_8K_Bank(0xC000>>13,EXPREGS[1]);
+    SetPROM_8K_Bank(0xA000>>13,EXPREGS[2]);
+  } 
+  else
+  {
+    SetPROM_8K_Bank(A>>13,V&0x3F);
+  }
+}
+
+
+void fceuMMC3::M121Write(uint16 A, uint8 V)
+{
+	if(A>=0xA000)
+	{
+		fceuMMC3::Mmc3Write(A,V);
+	}else
+
+  switch(A&0xE003)
+  {
+    case 0x8000:
+                 MMC3_CMDWrite(A,V);
+                 FixMMC3PRG(MMC3_cmd);
+                 break;
+    case 0x8001: EXPREGS[6] = ((V&1)<<5)|((V&2)<<3)|((V&4)<<1)|((V&8)>>1)|((V&0x10)>>3)|((V&0x20)>>5);
+                 if(!EXPREGS[7]) M121Sync();
+                 MMC3_CMDWrite(A,V);
+                 FixMMC3PRG(MMC3_cmd);
+                 break;
+    case 0x8003: EXPREGS[5] = V;
+                 M121Sync();
+                 MMC3_CMDWrite(0x8000,V);
+                 FixMMC3PRG(MMC3_cmd);
+                 break;
+  }
+}
+
+
+void fceuMMC3::M121LoWrite(uint16 A, uint8 V)
+{
+	if( (A>=0x5000)&&(A<0x6000) )
+	{
+		const uint8 prot_array[16] = { 0x83, 0x83, 0x42, 0x00 };
+		EXPREGS[4] = prot_array[V&3]; 
+	}else{
+		fceuMMC3::Mmc3WriteLow(A,V);
+	}
+}
+
+BYTE fceuMMC3::M121Read(WORD A)
+{
+	if( (A>=0x5000)&&(A<0x6000) )
+	return EXPREGS[4];
+	else
+		return fceuMMC3::Mmc3ReadLow(A);
+}
+
 //mapper 194
 void fceuMMC3::M194CW(uint32 A, uint8 V)
 {
@@ -553,6 +779,107 @@ void fceuMMC3::M199Write(uint16 A, uint8 V)
     else
       MMC3_IRQWrite(A,V);
 }
+//mapper 205
+void fceuMMC3::Reset205()
+{
+ EXPREGS[0]=0;
+ 
+ pwrap=&fceuMMC3::M205PW;
+ cwrap=&fceuMMC3::M205CW;
+ pWriteLow = &fceuMMC3::M205Write;
+}
+
+void fceuMMC3::M205PW(uint32 A, uint8 V)
+{
+ if(EXPREGS[0]&2)
+    SetPROM_8K_Bank(A>>13,(V&0x0f)|((EXPREGS[0]&3)<<4));
+ else
+    SetPROM_8K_Bank(A>>13,(V&0x1f)|((EXPREGS[0]&3)<<4));
+}
+void fceuMMC3::M205CW(uint32 A, uint8 V)
+{
+ SetVROM_1K_Bank(A>>10,V|((EXPREGS[0]&3)<<7));
+}
+void fceuMMC3::M205Write(uint16 A, uint8 V)
+{
+ if((A&0x6800)==0x6800) EXPREGS[0]= V;
+ FixMMC3PRG(MMC3_cmd);
+ FixMMC3CHR(MMC3_cmd);
+}
+
+//mapper 217
+void fceuMMC3::Reset217()
+{
+	cmdin = 0;
+	EXPREGS[0]=0;
+	EXPREGS[1]=0xFF;
+	EXPREGS[2]=3;
+
+	cwrap=&fceuMMC3::M217CW;
+	pwrap=&fceuMMC3::M217PW;
+
+	pWrite = &fceuMMC3::M217Write;
+	pWriteLow = &fceuMMC3::M217ExWrite;
+}
+void fceuMMC3::M217CW(uint32 A, uint8 V)
+{
+ if(EXPREGS[1]&0x08)
+   SetVROM_1K_Bank(A>>10,V|((EXPREGS[1]&3)<<8));
+ else
+   SetVROM_1K_Bank(A>>10,(V&0x7F)|((EXPREGS[1]&3)<<8)|((EXPREGS[1]&0x10)<<3));
+}
+void fceuMMC3::M217PW(uint32 A, uint8 V)
+{
+ if(EXPREGS[0]&0x80)
+ {
+   SetPROM_16K_Bank(4,(EXPREGS[0]&0x0F)|((EXPREGS[1]&3)<<4));
+   SetPROM_16K_Bank(6,(EXPREGS[0]&0x0F)|((EXPREGS[1]&3)<<4));
+ }
+ else if(EXPREGS[1]&0x08)
+        SetPROM_8K_Bank(A>>13,(V&0x1F)|((EXPREGS[1]&3)<<5));
+      else
+        SetPROM_8K_Bank(A>>13,(V&0x0F)|((EXPREGS[1]&3)<<5)|(EXPREGS[1]&0x10));
+}
+void fceuMMC3::M217Write(uint16 A, uint8 V)
+{
+	const uint8 m217_perm[8] = {0, 6, 3, 7, 5, 2, 4, 1};
+ if(!EXPREGS[2])
+ {
+  if(A >= 0xc000)
+    MMC3_IRQWrite(A, V);
+  else
+    MMC3_CMDWrite(A,V);
+ }
+ else switch(A&0xE001)
+ {
+   case 0x8000: IRQCount=V; break;
+   case 0xE000: nes->cpu->ClrIRQ(IRQ_MAPPER);IRQa=0; break;
+   case 0xC001: IRQa=1; break;
+   case 0xA001: SetVRAM_Mirror((V&1)^1); break;
+   case 0x8001: MMC3_CMDWrite(0x8000,(V&0xC0)|(m217_perm[V&7])); cmdin=1; break;
+   case 0xA000: if(!cmdin) break;
+                MMC3_CMDWrite(0x8001,V);
+                cmdin=0;
+                break;
+ }
+}
+void fceuMMC3::M217ExWrite(uint16 A, uint8 V)
+{
+ switch(A)
+ {
+  case 0x5000:
+       EXPREGS[0]=V;
+       FixMMC3PRG(MMC3_cmd);
+       break;
+  case 0x5001:
+       EXPREGS[1]=V;
+       FixMMC3PRG(MMC3_cmd);
+       break;
+  case 0x5007:
+       EXPREGS[2]=V;
+       break;
+ }
+}
 
 //SACHEN_STREETHEROES
 void fceuMMC3::MSHCW(uint32 A, uint8 V)
@@ -572,6 +899,7 @@ void fceuMMC3::MSHCW(uint32 A, uint8 V)
   }
 }
 
+
 void fceuMMC3::MSHWrite(uint16 A, uint8 V)
 {
 	if(A=0x4100)
@@ -582,6 +910,7 @@ void fceuMMC3::MSHWrite(uint16 A, uint8 V)
 	else
 		Mapper::WriteLow( A, V );
 }
+
 
 BYTE fceuMMC3::MSHRead(uint16 A)
 {

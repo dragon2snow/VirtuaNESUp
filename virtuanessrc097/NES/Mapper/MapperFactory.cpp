@@ -29,6 +29,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 #include "MMC3.h"
+#include "Sachen.h"
 #include "Mapper000.h"
 #include "Mapper001.h"
 #include "Mapper002.h"
@@ -101,6 +102,7 @@
 #include "Mapper118.h"
 #include "Mapper119.h"
 #include "Mapper122.h"
+#include "Mapper175.h"
 #include "Mapper180.h"
 #include "Mapper181.h"
 #include "Mapper185.h"
@@ -199,6 +201,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "MMC3.cpp"
+#include "Sachen.cpp"
 #include "Mapper000.cpp"
 #include "Mapper001.cpp"
 #include "Mapper002.cpp"
@@ -272,6 +275,7 @@
 #include "Mapper118.cpp"
 #include "Mapper119.cpp"
 #include "Mapper122.cpp"
+#include "Mapper175.cpp"
 #include "Mapper180.cpp"
 #include "Mapper181.cpp"
 #include "Mapper185.cpp"
@@ -414,6 +418,9 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 				return new fceuMMC3(parent,SACHEN_STREETHEROES);
 			case BMC_SUPER_24IN1:
 				return new fceuMMC3(parent,BMC_SUPER_24IN1);
+				
+			case BMC_T262:
+				return new MapperT262(parent);
 
 		}
 		return NULL;
@@ -483,8 +490,14 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			return new Mapper042(parent);
 		case	43:
 			return new Mapper043(parent);
+		//case	47:
+		//	return new fceuMMC3(parent,47);
 		case	48:
 			return new Mapper048(parent);
+		case	49:
+			return new fceuMMC3(parent,49);
+		case	52:
+			return new fceuMMC3(parent,52);
 		case	64:
 			return new Mapper064(parent);
 		case	65:
@@ -561,9 +574,19 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			return new Mapper118(parent);
 		case	119:
 			return new Mapper119(parent);
+		case	121:
+			return new fceuMMC3(parent,121);
 		case	122:
 		case	184:
 			return new Mapper122(parent);
+		case	175:
+			return new Mapper175(parent);
+		//case	176:
+		//	return new Mapper176(parent);
+		case	177:
+			return new Mapper177(parent);
+		case	178:
+			return new Mapper178(parent);		
 		case	180:
 			return new Mapper180(parent);
 		case	181:
@@ -576,8 +599,12 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			return new Mapper188(parent);
 		case	189:
 			return new Mapper189(parent);
+		case 205:
+			return new fceuMMC3(parent,205);
 		case	216:
 			return new Mapper216(parent);
+		case	217:
+			return new fceuMMC3(parent,217);
 		case	243:
 			return new Mapper243(parent);
 		case	0x100:
@@ -637,6 +664,14 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			return new Mapper140(parent);
 		case	142:
 			return new Mapper142(parent);
+		case	146:
+			return new Sachen(parent,146);
+		case	147:
+			return new Sachen(parent,147);
+		case	148:
+			return new Sachen(parent,148);
+		case	150:
+			return new Sachen(parent,150);
 		case	160:
 			return new Mapper160(parent);
 		case	162:
@@ -663,7 +698,6 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 		case	198:
 			return new Mapper198(parent);
 		case	199:
-			//return new fceuMMC3(parent,199);
 			return new Mapper199(parent);
 		case	222:
 			return new Mapper222(parent);
