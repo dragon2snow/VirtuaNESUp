@@ -137,7 +137,36 @@ public:
 	void GENPWRAP(uint32 A, uint8 V);
 	void GENMWRAP(uint8 V);
 	void GENNOMWRAP(uint8 V);
-	
+
+	//mapper 47
+	void Reset47();
+	void M47PW(uint32 A, uint8 V);
+	void M47CW(uint32 A, uint8 V);
+	void M47Write(uint16 A, uint8 V);
+
+	//mapper 49
+	void Reset49();
+	void M49PW(uint32 A, uint8 V);
+	void M49CW(uint32 A, uint8 V);
+	void M49Write(uint16 A, uint8 V);
+
+	//mapper 52
+	void Reset52();
+	void M52PW(uint32 A, uint8 V);
+	void M52CW(uint32 A, uint8 V);
+	void M52Write(uint16 A, uint8 V);
+	BYTE M52ReadLow( WORD addr );
+
+	//mapper 121
+	void Reset121();
+	void M121Sync();
+	void M121CW(uint32 A, uint8 V);
+	void M121PW(uint32 A, uint8 V);
+	void M121Write(uint16 A, uint8 V);
+	void M121LoWrite(uint16 A, uint8 V);
+	BYTE M121Read(WORD A);
+
+
 	//mapper 194
 	void M194CW(uint32 A, uint8 V);
 	void Reset194();
@@ -148,6 +177,21 @@ public:
 	void M199CW(uint32 A, uint8 V);
 	void M199MW(uint8 V);
 	void M199Write(uint16 A, uint8 V);
+
+	//mapper 205
+	void Reset205();
+	void M205PW(uint32 A, uint8 V);
+	void M205CW(uint32 A, uint8 V);
+	void M205Write(uint16 A, uint8 V);
+
+	
+	//mapper 217
+	uint8 cmdin;
+	void Reset217();
+	void M217CW(uint32 A, uint8 V);
+	void M217PW(uint32 A, uint8 V);
+	void M217Write(uint16 A, uint8 V);
+	void M217ExWrite(uint16 A, uint8 V);
 
 	//SACHEN_STREETHEROES
 	uint8 tekker;

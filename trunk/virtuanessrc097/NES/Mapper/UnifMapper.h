@@ -50,3 +50,18 @@ protected:
 	BYTE trash;
 private:
 };
+
+class	MapperT262 : public Mapper
+{
+public:
+	MapperT262( NES* parent );
+	
+	void	Reset();
+	void	Write( WORD addr, BYTE data );
+	
+protected:
+	 uint16 addrreg;
+	 uint8 datareg;
+	 uint8 busy;
+private:
+};
