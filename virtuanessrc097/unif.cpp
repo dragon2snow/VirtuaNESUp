@@ -361,6 +361,7 @@ const BOARDINFO BoardInfo[]=
 	{ "FK23C",						 FK23C					  },
 	{ "BMC-Super24in1SC03",          BMC_SUPER_24IN1          },
 	{ "CHINA_ER_SAN2",				 CHINA_ER_SAN2			  },
+	{ "UNL-Sachen-74LS374N",		 S74LS374N				  },
 };
                                     
                                 

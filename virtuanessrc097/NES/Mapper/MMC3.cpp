@@ -302,6 +302,7 @@ void	fceuMMC3::Reset()
 	case  49: Reset49 (); break;
 	case  52: Reset52 (); break;
 	case 121: Reset121(); break;
+	case 134: Reset134(); break;
 	case 194: Reset194(); break;
 	case 199: Reset199(); break;
 	case 205: Reset205(); break;
@@ -707,6 +708,32 @@ BYTE fceuMMC3::M121Read(WORD A)
 	return EXPREGS[4];
 	else
 		return fceuMMC3::Mmc3ReadLow(A);
+}
+
+//mapper 134
+void fceuMMC3::Reset134()
+{
+ EXPREGS[0]=0;
+ cwrap=&fceuMMC3::M134CW;
+ pwrap=&fceuMMC3::M134PW;
+ pWriteLow=&fceuMMC3::M134Write;
+}
+void fceuMMC3::M134PW(uint32 A, uint8 V)
+{
+  SetPROM_8K_Bank(A>>13,(V&0x1F)|((EXPREGS[0]&2)<<4));
+}
+void fceuMMC3::M134CW(uint32 A, uint8 V)
+{
+  SetVROM_1K_Bank(A>>10,(V&0xFF)|((EXPREGS[0]&0x20)<<3));
+}
+void fceuMMC3::M134Write(uint16 A, uint8 V)
+{
+	if(A==0x6001)
+	{
+		EXPREGS[0]=V;
+		FixMMC3CHR(MMC3_cmd);
+		FixMMC3PRG(MMC3_cmd);
+	}
 }
 
 //mapper 194

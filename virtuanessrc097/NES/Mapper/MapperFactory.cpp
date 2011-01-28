@@ -422,6 +422,9 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			case BMC_T262:
 				return new MapperT262(parent);
 
+			case S74LS374N:
+				return new Sachen(parent,150);
+
 		}
 		return NULL;
 	}
@@ -657,7 +660,8 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 		case	133:
 			return new Mapper133(parent);
 		case	134:
-			return new Mapper134(parent);
+			//return new Mapper134(parent);
+			return new fceuMMC3(parent,134);
 		case	135:
 			return new Mapper135(parent);
 		case	140:
