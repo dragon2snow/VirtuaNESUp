@@ -166,6 +166,11 @@ public:
 	void M121LoWrite(uint16 A, uint8 V);
 	BYTE M121Read(WORD A);
 
+	//mapper 134
+	void Reset134();
+	void M134PW(uint32 A, uint8 V);
+	void M134CW(uint32 A, uint8 V);
+	void M134Write(uint16 A, uint8 V);
 
 	//mapper 194
 	void M194CW(uint32 A, uint8 V);
