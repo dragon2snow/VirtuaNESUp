@@ -67,6 +67,11 @@ public:
 	void SA0161MSynco();
 	void SADWrite(WORD A, BYTE V );
 
+	//MAPPER 149 SA0036
+	void SA0036Reset(void);
+	void SA72007Synco();
+	void SA009Synco();
+
 	//mapper 150 (S74LS374N)
 	//void S74LS374NReset(void);
 

@@ -674,6 +674,8 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			return new Sachen(parent,147);
 		case	148:
 			return new Sachen(parent,148);
+		case	149:
+			return new Sachen(parent,149);
 		case	150:
 			return new Sachen(parent,150);
 		case	160:

@@ -25,6 +25,7 @@ void	Sachen::Reset()
 		case 146:	SA0161MReset();break;
 		case 147:	TCU01Reset();break;
 		case 148:	SA0037Reset();break;
+		case 149:	SA0036Reset();break;
 		case 150:	S74LS374NReset();break;
 	}
 }
@@ -190,6 +191,28 @@ void Sachen::SADWrite(WORD A, BYTE V )
 {
   latch[0]=V;
   (this->*WSync)();
+}
+
+
+//MAPPER 149 SA0036
+void Sachen::SA0036Reset(void)
+{
+  WSync  = &Sachen::SA72007Synco;
+  pWrite = &Sachen::SADWrite;
+
+  latch[0]=0;
+  (this->*WSync)();
+}
+
+void Sachen::SA009Synco()
+{
+  SetPROM_32K_Bank(0);
+  SetVROM_8K_Bank(latch[0]&1);
+}
+void Sachen::SA72007Synco()
+{
+  SetPROM_32K_Bank(0);
+  SetVROM_8K_Bank(latch[0]>>7);
 }
 
 //mapper 150 (S74LS374N)
