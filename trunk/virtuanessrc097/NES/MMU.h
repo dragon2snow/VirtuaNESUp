@@ -30,6 +30,7 @@ extern	BYTE	WRAM[128*1024];		// 儚乕僋/僶僢僋傾僢僾RAM
 extern	BYTE	DRAM[ 40*1024];		// 僨傿僗僋僔僗僥儉RAM
 extern	BYTE	XRAM[  8*1024];		// 僟儈乕僶儞僋
 extern	BYTE	ERAM[ 32*1024];		// 奼挘婡婍梡RAM
+extern  BYTE	MRAM[128*1024];		//byemu 专用
 
 extern	BYTE	CRAM[ 32*1024];		// 僉儍儔僋僞僷僞乕儞RAM
 extern	BYTE	VRAM[  4*1024];		// 僱乕儉僥乕僽儖/傾僩儕價儏乕僩RAM
@@ -56,6 +57,12 @@ extern	WORD	loopy_x;		// tile x offset
 extern	LPBYTE	PROM;		// PROM ptr
 extern	LPBYTE	VROM;		// VROM ptr
 
+extern LPBYTE	PROMPTR[16];
+extern LPBYTE	VROMPTR[16];
+
+extern INT PPROM_8K_SIZE[16];
+extern INT PVROM_1K_SIZE[16];
+
 #ifdef	_DATATRACE
 // For dis...
 extern	LPBYTE	PROM_ACCESS;
@@ -68,6 +75,19 @@ extern	INT	VROM_1K_SIZE, VROM_2K_SIZE, VROM_4K_SIZE,  VROM_8K_SIZE;
 
 // 娭悢
 extern	void	NesSub_MemoryInitial();
+
+//增加代码
+//extern	void	SetPrg2 ( WORD A, INT bank );
+//extern	void	SetPrg4 ( WORD A, INT bank );
+extern	void	SetPrg8 ( WORD A, WORD bank );
+extern	void	SetPrg16( WORD A, WORD bank );
+extern	void	SetPrg32( WORD A, WORD bank );
+
+//extern	void	SetPrg2r (int r, WORD A, INT bank);
+//extern	void	SetPrg4r (int r, WORD A, INT bank);
+extern	void	SetPrg8r (int r, WORD A, WORD bank);
+extern	void	SetPrg16r(int r, WORD A, WORD bank);
+extern	void	SetPrg32r(int r, WORD A, WORD bank);
 
 extern	void	SetPROM_Bank( BYTE page, LPBYTE ptr, BYTE type );
 extern	void	SetPROM_8K_Bank ( BYTE page, INT bank );
@@ -82,6 +102,15 @@ extern	void	SetVROM_4K_Bank( BYTE page, INT bank );
 extern	void	SetVROM_8K_Bank( INT bank );
 extern	void	SetVROM_8K_Bank( INT bank0, INT bank1, INT bank2, INT bank3,
 				 INT bank4, INT bank5, INT bank6, INT bank7 );
+
+extern	void	SetChr1( WORD A, INT bank );
+extern	void	SetChr2( WORD A, INT bank );
+extern	void	SetChr4( WORD A, INT bank );
+extern	void	SetChr8( WORD A, INT bank );
+extern	void	SetChr1r(int r, WORD A, INT bank);
+extern	void	SetChr2r(int r, WORD A, INT bank);
+extern	void	SetChr4r(int r, WORD A, INT bank);
+extern	void	SetChr8r(int r, WORD A, INT bank);
 
 extern	void	SetCRAM_1K_Bank( BYTE page, INT bank );
 extern	void	SetCRAM_2K_Bank( BYTE page, INT bank );

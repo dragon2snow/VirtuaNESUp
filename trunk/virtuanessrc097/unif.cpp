@@ -362,6 +362,30 @@ const BOARDINFO BoardInfo[]=
 	{ "BMC-Super24in1SC03",          BMC_SUPER_24IN1          },
 	{ "CHINA_ER_SAN2",				 CHINA_ER_SAN2			  },
 	{ "UNL-Sachen-74LS374N",		 S74LS374N				  },
+	{ "UNL-LH09",					 UNL_LH09				  },
+	{ "UNL-LH10",					 UNL_LH10				  },
+	{ "UNL-LE05",					 UNL_LE05				  },
+	{ "UNL-BB",						 UNL_BB				  },
+	{ "UNL-KS7037",					 UNL_KS7037				  },
+	{ "UNL-KS7016",					 UNL_KS7016				  },
+	{ "UNL-KS7017",					 UNL_KS7017				  },
+	{ "UNL-LH52",					 UNL_LH52				  },
+	{ "UNL-AC08",					 UNL_AC08				  },
+	{ "UNL-YOKO",					 UNL_YOKO				  },
+	{ "UNL-FS304",					  UNL_FS304		},
+	{ "UNL-LH76",					  UNL_LH764		},
+	{ "UNL-LH32",					  UNL_LH32		},
+	{ "UNL-LH53",					  UNL_LH53		},
+	{ "UNL-SA-9602B",					UNL_SA_9602B},
+	{ "WAIXING-FS005",				WAIXING_FS005	},
+	{ "WAIXING-FW01",				WAIXING_FW01	},
+	{ "BMC-60311C",					BMC_60311C		},
+	{ "UNL-1996M3-SUPER-5IN1",		UNL_1996M3_SUPER_5IN1},
+	{ "UNL-T4A54A",					UNL_T4A54A},
+	{ "BMC-K-3033",					BMC_K_3033},
+	{ "BMC-K-3088",					BMC_K_3088},
+	{ "BMC-JC-016-2",				BMC_JC_016_2},
+	{ "BMC-830425C-4391T",			BMC_830425C_4391T},
 };
                                     
                                 
@@ -371,7 +395,7 @@ int NES_ROM_get_unifBoardID(char *unif_board)
 	while(1)
 	{
 		if( iCount>=BOARD_MAX ) break;
-		if(strcmp(BoardInfo[iCount].boardName,unif_board)==0)
+		if(stricmp(BoardInfo[iCount].boardName,unif_board)==0)
 		{
 			return BoardInfo[iCount].boardID;
 		}

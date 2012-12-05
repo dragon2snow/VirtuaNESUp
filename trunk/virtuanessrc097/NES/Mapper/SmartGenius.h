@@ -36,3 +36,36 @@ private:
 	void	SetBank_CPU_L();
 	void	SetBank_PPU();
 };
+
+class	WaiXing_FS005 : public Mapper
+{
+public:
+	WaiXing_FS005( NES* parent ) : Mapper(parent) {}
+
+	
+	void	Reset();
+	void	WriteLow( WORD addr, BYTE data );
+	void	Write( WORD addr, BYTE data );
+
+
+	// For state save
+	BOOL	IsStateSave() { return TRUE; }
+	void	SaveState( LPBYTE p ){}
+	void	LoadState( LPBYTE p ){}
+};
+
+class	WaiXing_FW01 : public Mapper
+{
+public:
+	WaiXing_FW01( NES* parent ) : Mapper(parent) {}
+
+	
+	void	Reset();
+	void	Write( WORD addr, BYTE data );
+
+
+	// For state save
+	BOOL	IsStateSave() { return TRUE; }
+	void	SaveState( LPBYTE p ){}
+	void	LoadState( LPBYTE p ){}
+};

@@ -14,7 +14,6 @@ void	Mapper194::Reset()
 	SetBank_CPU();
 	SetBank_PPU();
 
-	we_sram  = 0;	
 	irq_enable=irq_counter=irq_latch=irq_request = 0;
 }
 
@@ -49,9 +48,9 @@ void	Mapper194::Write( WORD addr, BYTE data )
 			reg[1] = data;
 
 			switch( reg[0] & 0x0f ) {
-				case	0x00:	chr[0] = data ;			SetBank_PPU();				break;
-				case	0x01:	chr[2] = data ;			SetBank_PPU();				break;
-				case	0x02:
+				case	0x00:	chr[0] = (data & 0xFE) | 0,chr[1] = (data & 0xFE) | 1 ;
+				case	0x01:	chr[2] = (data & 0xFE) | 0,chr[3] = (data & 0xFE) | 1 ;
+				case	0x02:   
 				case	0x03:
 				case	0x04:
 				case	0x05:	chr[(reg[0] & 0x07)+2] = data;	SetBank_PPU();		break;
@@ -59,8 +58,6 @@ void	Mapper194::Write( WORD addr, BYTE data )
 				case	0x07:
 				case	0x08:
 				case	0x09:	prg[(reg[0] & 0x0f)-6] = data;	SetBank_CPU();		break;
-				case 0xA:		chr[1] = data;				SetBank_PPU();			break;
-				case 0xB:		chr[3] = data;				SetBank_PPU();			break;
 			}
 			break;
 		case	0xA000:
@@ -138,8 +135,6 @@ void	Mapper194::SetBank_CPU()
 void	Mapper194::SetBank_PPU()
 {
 	unsigned int bank = (reg[0]&0x80)>>5;
-	chr[1]=chr[0]+1;
-	chr[3]=chr[2]+1;
 	for(int x=0; x<8; x++)
 	{
 		if( chr[x]<=1 )

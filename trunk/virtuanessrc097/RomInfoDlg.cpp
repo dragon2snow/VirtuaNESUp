@@ -36,7 +36,8 @@ DLGMSG	CRomInfoDlg::OnInitDialog( DLGMSGPARAM )
 	::SetDlgItemText( m_hWnd, IDC_ROM_NAME, m_szName );
 
 	CHAR	szStr[64];
-	if( m_nMapper < 256 ) ::wsprintf( szStr, "%d", m_nMapper );
+	if( m_bUnif ) ::wsprintf( szStr, "%s", m_pszBoard );
+	else if( m_nMapper < 256 ) ::wsprintf( szStr, "%d", m_nMapper );
 	else		      ::wsprintf( szStr, "NSF" );
 
 	::SetDlgItemText( m_hWnd, IDC_ROM_MAPPER, szStr );

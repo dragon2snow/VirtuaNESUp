@@ -155,7 +155,7 @@ void	PPU::Reset()
 
 BYTE	PPU::Read( WORD addr )
 {
-BYTE	data = 0x00;
+	BYTE	data = 0x00;
 
 	switch( addr ) {
 		// Write only Register
@@ -178,6 +178,7 @@ BYTE	data = 0x00;
 			break;
 		case	0x2007: // VRAM I/O Register(RW)
 			WORD	addr = loopy_v & 0x3FFF;
+			//WORD	AV = loopy_v;
 			data = PPU7_Temp;
 			if( PPUREG[0] & PPU_INC32_BIT ) loopy_v+=32;
 			else				loopy_v++;
@@ -197,7 +198,8 @@ BYTE	data = 0x00;
 				nes->mapper->PPU_ChrLatch( addr );
 			}
 
-			PPU7_Temp = PPU_MEM_BANK[addr>>10][addr&0x03FF];
+			//PPU7_Temp = PPU_MEM_BANK[addr>>10][addr&0x03FF];
+			PPU7_Temp = nes->mapper->PpuRead(addr);
 	}
 
 	return	data;
@@ -278,6 +280,7 @@ void	PPU::Write( WORD addr, BYTE data )
 
 		case	0x2007: // VRAM I/O Register(RW)
 			WORD	vaddr = loopy_v & 0x3FFF;
+			//WORD    AV = loopy_v;
 			if( PPUREG[0] & PPU_INC32_BIT ) loopy_v+=32;
 			else				loopy_v++;
 
@@ -304,9 +307,12 @@ void	PPU::Write( WORD addr, BYTE data )
 				}
 				vaddr &= 0xEFFF;
 			}
-			if( PPU_MEM_TYPE[vaddr>>10] != BANKTYPE_VROM ) {
-				PPU_MEM_BANK[vaddr>>10][vaddr&0x03FF] = data;
-			}
+			
+			//loopy_v  vaddr
+			nes->mapper->PpuWrite(vaddr,data);
+			//if( PPU_MEM_TYPE[vaddr>>10] != BANKTYPE_VROM ) {
+				//PPU_MEM_BANK[vaddr>>10][vaddr&0x03FF] = data;
+			//}
 			break;
 	}
 }

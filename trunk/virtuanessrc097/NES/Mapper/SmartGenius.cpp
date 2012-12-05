@@ -1,6 +1,8 @@
 //////////////////////////////////////////////////////////////////////////
 // SmartGenius                                                            //
 //////////////////////////////////////////////////////////////////////////
+#pragma warning (disable:4554)
+
 void	MapperSmartGenius::Reset()
 {
 //	nes->ppu->SetVromWrite(1);
@@ -343,4 +345,62 @@ void	MapperSmartGenius::LoadState( LPBYTE p )
 	irq_counter = p[17];
 	irq_latch   = p[18];
 	irq_request = p[19];
+}
+
+
+
+
+
+
+void	WaiXing_FS005::Reset()
+{
+	SetPROM_32K_Bank( 0, 1, 0x3e, 0x3f );
+}
+
+void	WaiXing_FS005::WriteLow( WORD addr, BYTE data )
+{
+	switch( addr ) {
+		case	0x5010:			break;
+		case	0x5011:			
+			SetPROM_32K_Bank(data>>1);
+			break;
+		case	0x5012:			break;
+		default:
+			//Mapper::WriteLow( addr, data );
+			break;
+	}
+	if(addr>=0x6000){
+		CPU_MEM_BANK[addr>>13][addr&0x1FFF] = data;
+	}
+}
+
+
+void	WaiXing_FS005::Write( WORD addr, BYTE data )
+{
+	switch( addr & 0xE001 ) 
+	{
+		case	0xA000:
+			if( !nes->rom->Is4SCREEN() ) {
+				if( data & 0x01 ) SetVRAM_Mirror( VRAM_HMIRROR );
+				else		  SetVRAM_Mirror( VRAM_VMIRROR );
+			}
+			break;		
+	}		
+}
+
+
+void	WaiXing_FW01::Reset()
+{
+	SetPROM_32K_Bank( 0, 1,0 ,1);
+	SetVRAM_Mirror( VRAM_HMIRROR );
+}
+
+void	WaiXing_FW01::Write( WORD A, BYTE V )
+{
+	if( A>=0x8083 )
+	{
+		int bank = (A-0x8083)/8;
+		if(bank>0x20) bank-=0x10;
+			SetPrg32(0x8000,bank );
+	}	
 }

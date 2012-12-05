@@ -29,12 +29,13 @@ public:
 	// For Mapper
 	// Reset
 	virtual	void	Reset() = 0;
+	virtual	void	SoftReset(){}
 
 	// $8000-$FFFF Memory write
 	virtual	void	Write( WORD addr, BYTE data ) {}
 
-	// $8000-$FFFF Memory read(Dummy)
-	virtual	void	Read( WORD addr, BYTE data ) {}
+	// $8000-$FFFF Memory read
+	virtual	BYTE	Read( WORD addr) {return CPU_MEM_BANK[addr>>13][addr&0x1FFF];}
 
 	// $4100-$7FFF Lower Memory read/write
 	virtual	BYTE	ReadLow ( WORD addr );
@@ -80,6 +81,8 @@ public:
 	virtual	void	SaveState( LPBYTE p ) {}
 	virtual	void	LoadState( LPBYTE p ) {}
 
+	virtual	BYTE	PpuRead( WORD A);
+	virtual	void	PpuWrite( WORD A, BYTE V ) ;
 protected:
 	NES*	nes;
 

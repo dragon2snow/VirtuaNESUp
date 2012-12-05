@@ -29,7 +29,7 @@ void	Mapper015::Write( WORD addr, BYTE data )
 {
 	uint8 PRGbank = (data & 0x3F) << 1;
 	uint8 PRGflip = (data & 0x80) >> 7;
-
+	Mirror = data & 0x40;
 	switch( addr ) {
 		case	0x8000:
 				PRGbank &= 0x7C;

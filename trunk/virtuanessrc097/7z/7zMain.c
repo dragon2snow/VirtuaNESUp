@@ -329,57 +329,89 @@ int SevenZipUnCompress( char *fname, unsigned char ** ppBuf,size_t * lpdwSize)
       Byte *outBuffer = 0; /* it must be 0 before first call for each new archive. */
 
       for (i = 0; i < db.db.NumFiles; i++)
-      {
-        size_t offset = 0;
-        size_t outSizeProcessed = 0;
-        const CSzFileItem *f = db.db.Files + i;
-        size_t len;
+	  {
+		  size_t offset = 0;
+		  size_t outSizeProcessed = 0;
+		  const CSzFileItem *f = db.db.Files + i;
+		  size_t len;
 
-        len = SzArEx_GetFileNameUtf16(&db, i, NULL);
+		  len = SzArEx_GetFileNameUtf16(&db, i, NULL);
 
-        if (len > tempSize)
-        {
-          SzFree(NULL, temp);
-          tempSize = len;
-          temp = (UInt16 *)SzAlloc(NULL, tempSize * sizeof(temp[0]));
-          if (temp == 0)
-          {
-            res = SZ_ERROR_MEM;
-            break;
-          }
-        }
-
-        SzArEx_GetFileNameUtf16(&db, i, temp);
-        //获取文件信息
-        {
-          char attr[8];
-          GetAttribString(f->AttribDefined ? f->Attrib : 0, f->IsDir, attr);// f->IsDir 文件是否是目录
-          
-		  //UInt64ToStr(f->Size, s);//f->Size 文件大小
-
-		  if(f->IsDir!=1)
+		  if (len > tempSize)
 		  {
-			//检测扩展名
-			  if( (f->Size>16000)&&(f->Size<10000000) )
-			  bHasRomFile =1;
-		  }		  
+			  SzFree(NULL, temp);
+			  tempSize = len;
+			  temp = (UInt16 *)SzAlloc(NULL, tempSize * sizeof(temp[0]));
+			  if (temp == 0)
+			  {
+				  res = SZ_ERROR_MEM;
+				  break;
+			  }
+		  }
 		  
-		  if(bHasRomFile==0)
-			continue;
-        }
-		
-        if (bHasRomFile)
-        {
-          res = SzArEx_Extract(&db, &lookStream.s, i,&blockIndex, ppBuf, lpdwSize,&offset, &outSizeProcessed,&allocImp, &allocTempImp);
-          if (res != SZ_OK)
-            continue;
-		  else
-		    bExtractRomOK = 1;
-        }
-		if(bExtractRomOK)
-		break;
-      }//结束文件枚举循环	  
-      IAlloc_Free(&allocImp, outBuffer);
+		  SzArEx_GetFileNameUtf16(&db, i, temp);
+		  //获取文件信息
+		  {
+			  char attr[8];
+			  GetAttribString(f->AttribDefined ? f->Attrib : 0, f->IsDir, attr);// f->IsDir 文件是否是目录
+			  
+			  //UInt64ToStr(f->Size, s);//f->Size 文件大小
+			  if(f->IsDir!=1)
+			  {
+				  //检测扩展名
+				  if(len>5)
+				  {
+					  //"*.nes",
+					  //"*.unf",
+					  //"*.fds",
+					  //"*.nsf",
+					  if(wcsicmp(L".nes",&temp[len-5])==0)
+					  {
+						  bHasRomFile =1;
+					  }
+					  else if(wcsicmp(L".unf",&temp[len-5])==0)
+					  {
+						  bHasRomFile =1;
+					  }
+					  else if(wcsicmp(L".fds",&temp[len-5])==0)
+					  {
+						  bHasRomFile =1;
+					  }
+					  else if(wcsicmp(L".nsf",&temp[len-5])==0)
+					  {
+						  bHasRomFile =1;
+					  }
+				  }
+				  //if( (f->Size>16000)&&(f->Size<10000000) )
+				  //bHasRomFile =1;
+			  }		  
+
+			  if(bHasRomFile==0)
+				  continue;
+		  }
+
+		  if (bHasRomFile)
+		  {
+			  res = SzArEx_Extract(&db, &lookStream.s, i,&blockIndex, ppBuf, lpdwSize,&offset, &outSizeProcessed,&allocImp, &allocTempImp);
+			  if (res != SZ_OK)
+				  continue;
+			  else
+			  {
+				  bExtractRomOK = 1;
+				  if(offset!=0)
+				  {//重组
+					  void *pRom = malloc(f->Size);
+					  memcpy(pRom,*ppBuf+offset,f->Size);
+					  *lpdwSize = f->Size;
+					  free(*ppBuf);
+					  *ppBuf = pRom;
+				  }
+			  }
+		  }
+		  if(bExtractRomOK)
+			  break;
+	  }//结束文件枚举循环	  
+	  IAlloc_Free(&allocImp, outBuffer);
   }
   SzArEx_Free(&db, &allocImp);
   SzFree(NULL, temp);

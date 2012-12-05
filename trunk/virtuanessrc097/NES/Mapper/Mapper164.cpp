@@ -125,3 +125,55 @@ void	Mapper164::LoadState( LPBYTE p )
 	a3 = p[2];
 	p_mode = p[3];
 }
+
+
+
+
+
+
+
+///
+void	MapperUNL_FS304::Reset()
+{
+	memset(reg,0,8);
+	//SetPROM_32K_Bank(0,1,PROM_8K_SIZE-2, PROM_8K_SIZE-1);
+	
+	SetPROM_32K_Bank((reg[0]<<4)|(reg[1]&0xF));
+	//Sync();
+}
+
+void MapperUNL_FS304::WriteLow(WORD A, BYTE V)
+{
+	switch(A&0xf000)
+	{
+		case 0x5000:
+			reg[(A>>8)&3]=V;
+			Sync();
+			break;
+		case 0x6000:
+		case 0x7000:
+			WRAM[A-0x6000]=V;
+			break;
+	}
+}
+
+
+BYTE	MapperUNL_FS304::ReadLow ( WORD A )
+{
+	switch(A&0xf000)
+	{
+		case 0x6000:
+		case 0x7000:
+			return WRAM[A-0x6000];
+			break;
+	}
+	return Mapper::ReadLow(A);
+}
+
+
+void	MapperUNL_FS304::Sync()
+{
+	
+  SetPROM_32K_Bank((reg[0]&0xe)|((reg[1]>>1)&1)|((reg[2]&15)<<4));
+}
+

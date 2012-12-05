@@ -23,7 +23,6 @@ protected:
 	BYTE	reg[8];
 	BYTE	prg[4];
 	BYTE	chr[8];
-	BYTE	we_sram;
 
 	BYTE	irq_type;
 	BYTE	irq_enable;

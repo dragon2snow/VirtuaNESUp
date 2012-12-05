@@ -13,6 +13,7 @@
 using namespace std;
 
 #include "VirtuaNESres.h"
+#include "resource.h"
 #include "DebugOut.h"
 #include "App.h"
 #include "Pathlib.h"
@@ -137,6 +138,10 @@ WND_ON_COMMAND_RANGE( ID_CHEAT_ENABLE, ID_CHEAT_DISABLE, OnCheatCommand )
 WND_ON_COMMAND( ID_GENIE, OnGenie )
 
 WND_ON_COMMAND( ID_AUTOIPS, OnEmuCommand )
+WND_ON_COMMAND( ID_TOOL_DUMPPPU, OnEmuCommand )
+WND_ON_COMMAND( ID_TOOL_DUMPCPU, OnEmuCommand )
+WND_ON_COMMAND( ID_TOOL_DUMPCHR, OnEmuCommand )
+WND_ON_COMMAND( ID_TOOL_DUMPPRG, OnEmuCommand )
 
 WND_ON_COMMAND( ID_BARCODEBATTLER, OnDatachBacode )
 WND_ON_COMMAND( ID_VSUNISYSTEM_DIPSWITCH, OnDipSwitch )
@@ -1359,6 +1364,7 @@ WNDCMD	CMainFrame::OnRomInfo( WNDCMDPARAM )
 
 	// 儊儞僶偺愝掕
 	::strcpy( dlg.m_szName, Nes->rom->GetRomName() );
+	dlg.m_bUnif   = Nes->rom->IsUnifMapper();
 	dlg.m_nMapper = Nes->rom->GetMapperNo();
 	dlg.m_nPRG    = Nes->rom->GetPROM_SIZE();
 	dlg.m_nCHR    = Nes->rom->GetVROM_SIZE();
@@ -1367,6 +1373,9 @@ WNDCMD	CMainFrame::OnRomInfo( WNDCMDPARAM )
 	dlg.m_b4Screen = Nes->rom->Is4SCREEN();
 	dlg.m_bTrainer = Nes->rom->IsTRAINER();
 	dlg.m_bVSUnisystem = Nes->rom->IsVSUNISYSTEM();
+
+	if(dlg.m_bUnif)
+		dlg.m_pszBoard = Nes->rom->GetBoardName();
 
 	if( Nes->rom->GetMapperNo() < 256 && Nes->rom->GetMapperNo() != 20 ) {
 		dlg.m_dwCRC    = Nes->rom->GetPROM_CRC();
@@ -2117,6 +2126,90 @@ WNDCMD	CMainFrame::OnViewCommand( WNDCMDPARAM )
 			break;
 	}
 }
+void PpuDump(void)
+{
+	char exePath[MAX_PATH] = {0};
+	GetModuleFileNameA(NULL,exePath,MAX_PATH);
+	PathRemoveFileSpecA(exePath);
+	strcat(exePath,"\\DUMP.PPU");
+
+	//PAL
+	FILE *fp=fopen(exePath,"w+b");
+	if(fp==NULL){
+		MessageBox(NULL,"DUMP PPU 出错","出错",0);
+		return;}
+	
+	for(int i=0; i<12; i++){
+		if( PPU_MEM_BANK[i]==NULL )	break;
+		fwrite(PPU_MEM_BANK[i],1,1024,fp);
+	}
+
+	fwrite(BGPAL,1,16,fp);	
+	fwrite(SPPAL,1,16,fp);	
+	fclose(fp);
+}
+
+void CpuDump(void)
+{
+	char exePath[MAX_PATH] = {0};
+	GetModuleFileNameA(NULL,exePath,MAX_PATH);
+	PathRemoveFileSpecA(exePath);
+	strcat(exePath,"\\DUMP.CPU");
+
+	//PAL
+	FILE *fp=fopen(exePath,"w+b");
+	if(fp==NULL){
+		MessageBox(NULL,"DUMP CPU 出错","出错",0);
+		return;}
+	
+	for(int i=0; i<8; i++){
+		if( CPU_MEM_BANK[i]==NULL )	break;
+		fwrite(CPU_MEM_BANK[i],1,0x2000,fp);
+	}	
+	fclose(fp);
+}
+
+void PrgDump(void)
+{
+	char exePath[MAX_PATH] = {0};
+	char dumpFile[MAX_PATH] = {0};
+	GetModuleFileNameA(NULL,exePath,MAX_PATH);
+	PathRemoveFileSpecA(exePath);
+
+	for(int i=0; i<16; i++)
+	{
+		if(PPROM_8K_SIZE[i]!=0)
+		{
+			sprintf(dumpFile,"%s\\PRG%d.NES",exePath,i);
+
+			FILE *fp=fopen(dumpFile,"w+b");
+			if(fp==NULL) continue;
+			fwrite(PROMPTR[i],1,0x2000*PPROM_8K_SIZE[i],fp);
+			fclose(fp);
+		}
+	}
+}
+
+void ChrDump(void)
+{
+	char exePath[MAX_PATH] = {0};
+	char dumpFile[MAX_PATH] = {0};
+	GetModuleFileNameA(NULL,exePath,MAX_PATH);
+	PathRemoveFileSpecA(exePath);
+
+	for(int i=0; i<16; i++)
+	{
+		if(PVROM_1K_SIZE[i]!=0)
+		{
+			sprintf(dumpFile,"%s\\CHR%d.NES",exePath,i);
+
+			FILE *fp=fopen(dumpFile,"w+b");
+			if(fp==NULL) continue;
+			fwrite(VROMPTR[i],1,1024*PVROM_1K_SIZE[i],fp);
+			fclose(fp);
+		}
+	}
+}
 
 WNDCMD	CMainFrame::OnEmuCommand( WNDCMDPARAM )
 {
@@ -2310,6 +2403,21 @@ _gohell:
 
 		case	ID_AUTOIPS:
 			Config.emulator.bAutoIPS = !Config.emulator.bAutoIPS;
+			break;
+
+		//
+		case	ID_TOOL_DUMPPPU:
+			PpuDump();
+			break;
+
+		case	ID_TOOL_DUMPCPU:
+			CpuDump();
+			break;
+		case	ID_TOOL_DUMPCHR:
+			ChrDump();
+			break;
+		case	ID_TOOL_DUMPPRG:
+			PrgDump();
 			break;
 
 		default:

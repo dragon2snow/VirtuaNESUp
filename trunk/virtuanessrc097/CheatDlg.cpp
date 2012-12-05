@@ -21,7 +21,7 @@ using namespace std;
 #include "CheatDlg.h"
 
 #include "EmuThread.h"
-
+#pragma warning (disable:4996)
 //
 // サーチダイアログ
 //

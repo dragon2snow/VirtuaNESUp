@@ -482,6 +482,8 @@ void	NES::SoftReset()
 		mapper->Reset();
 	}
 
+	mapper->SoftReset();
+
 	m_bDiskThrottle = FALSE;
 
 	base_cycles = emul_cycles = 0;
@@ -924,7 +926,7 @@ BYTE	NES::Read( WORD addr )
 		case	0x05:	// $A000-$BFFF
 		case	0x06:	// $C000-$DFFF
 		case	0x07:	// $E000-$FFFF
-			return	CPU_MEM_BANK[addr>>13][addr&0x1FFF];
+			return	mapper->Read( addr );
 	}
 
 	return	0x00;	// Warning—\–h

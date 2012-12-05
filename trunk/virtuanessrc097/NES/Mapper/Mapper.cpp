@@ -59,3 +59,19 @@ void	Mapper::WriteLow( WORD addr, BYTE data )
 	}
 }
 
+BYTE	Mapper::PpuRead( WORD A)
+{
+	//A=A&0x3fff;
+	//A &= 0xEFFF;
+	return PPU_MEM_BANK[A>>10][A&0x03FF];
+}
+
+void	Mapper::PpuWrite( WORD A, BYTE V ) 
+{
+	//A=A&0x3fff;
+	//A &= 0xEFFF;
+	if( PPU_MEM_TYPE[A>>10] != BANKTYPE_VROM ) 
+	{
+		PPU_MEM_BANK[A>>10][A&0x03FF] = V;
+	}
+}	

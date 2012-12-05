@@ -10,21 +10,14 @@ public:
 	void	Write( WORD addr, BYTE data );
 
 	void	Clock( INT cycles );
-	void	SetBank_PPUSUB( int bank, int page );
+	void	Sync(void);
 	// For state save
 	BOOL	IsStateSave() { return TRUE; }
 	void	SaveState( LPBYTE p );
 	void	LoadState( LPBYTE p );
 
 protected:
-	BYTE	reg[8];
-	BYTE	irq_enable;
-	BYTE	irq_counter;
-	BYTE	irq_latch;
-	//BYTE	irq_occur;
-	INT	irq_clock;
-	
-	BYTE	VRAM_switch;
-	BYTE	rom_type ;
+	 BYTE chrlo[8], chrhi[8], prg[2], mirr, vlock;
+	 DWORD IRQa, IRQCount, IRQLatch, IRQClock; 
 private:
 };

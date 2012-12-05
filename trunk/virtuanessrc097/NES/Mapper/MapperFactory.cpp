@@ -29,7 +29,9 @@
 
 //////////////////////////////////////////////////////////////////////////
 #include "MMC3.h"
+#include "fceuMmc3.h"
 #include "Sachen.h"
+#include "Mapper0.h"
 #include "Mapper000.h"
 #include "Mapper001.h"
 #include "Mapper002.h"
@@ -197,11 +199,14 @@
 #include "fk23c.h"
 #include "Subor.h"
 #include "SmartGenius.h"
+#include "UNL_Mapper.h"
 
 //////////////////////////////////////////////////////////////////////////
 
 #include "MMC3.cpp"
+#include "fceuMmc3.cpp"
 #include "Sachen.cpp"
+#include "Mapper0.cpp"
 #include "Mapper000.cpp"
 #include "Mapper001.cpp"
 #include "Mapper002.cpp"
@@ -369,6 +374,7 @@
 #include "fk23c.cpp"
 #include "Subor.cpp"
 #include "SmartGenius.cpp"
+#include "UNL_Mapper.cpp"
 
 
 extern BOOL g_bSan2;
@@ -377,6 +383,10 @@ extern BOOL g_bSan2;
 //////////////////////////////////////////////////////////////////////////
 Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 {
+	#ifdef EMU_DUMP
+		return new Mapper0(parent);
+	#endif
+	
 	if( bUnif )
 	{
 		switch(no)
@@ -425,8 +435,72 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			case S74LS374N:
 				return new Sachen(parent,150);
 
+			//新dump的
+			case UNL_LH09://基于mapper42编写
+				return new MapperUNL_LH09(parent);
+
+			case UNL_LH10:
+				return new MapperUNL_LH10(parent);
+
+			case UNL_LE05://基于mapper42编写
+				return new MapperUNL_LE05(parent);
+			case UNL_BB:
+				return new MapperUNL_BB(parent);
+
+			case UNL_KS7037:
+				return new MapperUNL_KS7037(parent);
+
+			case UNL_KS7016:
+				return new MapperUNL_KS7016(parent);
+			case UNL_KS7017:
+				return new MapperUNL_KS7017(parent);
+
+			case UNL_LH52:
+				return new MapperUNL_LH52(parent);
+
+			case UNL_AC08:
+				return new MapperUNL_AC08(parent);
+
+			case UNL_YOKO:
+				return new MapperUNL_YOKO(parent);
+
+			case UNL_FS304:
+				return new MapperUNL_FS304(parent);
+			case UNL_LH764:
+				return new MapperUNL_LH764(parent);
+			case UNL_LH32:
+				return new MapperUNL_LH32(parent);
+			case UNL_LH53:
+				return new MapperUNL_LH53(parent);
+
+			case UNL_SA_9602B:
+				return new fceuMMC3(parent,UNL_SA_9602B);
+			case WAIXING_FS005:
+				return new WaiXing_FS005(parent);
+			case WAIXING_FW01:
+				return new WaiXing_FW01(parent);
+			case BMC_60311C:
+				return new Bmc_60311c(parent);
+			case UNL_1996M3_SUPER_5IN1:
+				return new Unl_96s3_s5in1(parent);
+			case BENSHENG_BS5:
+				return new Bs_5(parent);
+			case UNL_T4A54A:
+				return new T4a54a_c(parent);
+			case BMC_JC_016_2:
+				return new JC_016_2(parent);
+			case BMC_K_3033:
+				return new K_3033(parent);
+			case BMC_K_3088:
+				return new K_3088(parent);
+			case DREAMTECH_01:
+				return new Dream(parent);
+			case BMC_830425C_4391T:
+				return new BMC_830425C(parent);
+
 		}
-		return NULL;
+		return	new Mapper000(parent);
+		//return NULL;
 	}
 	switch( no ) {
 		case	0:
@@ -479,12 +553,16 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			return new Mapper025(parent);
 		case	26:
 			return new Mapper026(parent);
+		case    30:
+			return new WaiXing_FS005(parent);
 		case	32:
 			return new Mapper032(parent);
 		case	33:
 			return new Mapper033(parent);
 		case	34:
 			return new Mapper034(parent);
+		case	35:
+			return new Mapper035(parent);
 		case	40:
 			return new Mapper040(parent);
 		case	41:
@@ -607,7 +685,7 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 		case	216:
 			return new Mapper216(parent);
 		case	217:
-			return new fceuMMC3(parent,217);
+			return new fceumm_mmc3(parent,217);
 		case	243:
 			return new Mapper243(parent);
 		case	0x100:
@@ -703,8 +781,12 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			return new Mapper195(parent);
 		case	198:
 			return new Mapper198(parent);
+			//return new fceuMMC3(parent,198);
 		case	199:
+			//return new fceuMMC3(parent,199);
 			return new Mapper199(parent);
+		case	220:
+			return new Mapper220(parent);
 		case	222:
 			return new Mapper222(parent);
 		case	225:
@@ -762,6 +844,8 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			return new Mapper099(parent);
 		case	151:
 			return new Mapper151(parent);
+		case	156:
+			return new Mapper156(parent);
 
 		case	12:
 			return new Mapper012(parent);
@@ -793,6 +877,6 @@ Mapper*	CreateMapper( NES* parent, INT no,BOOL bUnif)
 			break;
 	}
 
-	return	NULL;
+	return	new Mapper000(parent);
 }
 
