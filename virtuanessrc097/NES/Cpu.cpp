@@ -601,27 +601,40 @@ CPU::~CPU()
 //#define	OP6502(A)	(CPU_MEM_BANK[(A)>>13][(A)&0x1FFF])
 //#define	OP6502W(A)	(*((WORD*)&CPU_MEM_BANK[(A)>>13][(A)&0x1FFF]))
 
-#if	0
+Mapper*	g_mapper=NULL;
+
+//#if	0
 #define	OP6502(A)	RD6502((A))
 #define	OP6502W(A)	RD6502W((A))
-#else
-inline	BYTE	OP6502( WORD addr )
-{
-	return	CPU_MEM_BANK[addr>>13][addr&0x1FFF];
-}
+//#else
+//inline	BYTE	OP6502( WORD addr )
+//{
+	//#ifdef EMU_DUMP
+	//return g_mapper->Read( addr );
+	//#else
+	//return	CPU_MEM_BANK[addr>>13][addr&0x1FFF];
+	//#endif
+//}
 
-inline	WORD	OP6502W( WORD addr )
-{
-#if	0
-	WORD	ret;
-	ret  = (WORD)CPU_MEM_BANK[(addr+0)>>13][(addr+0)&0x1FFF];
-	ret |= (WORD)CPU_MEM_BANK[(addr+1)>>13][(addr+1)&0x1FFF]<<8;
-	return	ret;
-#else
-	return	*((WORD*)&CPU_MEM_BANK[addr>>13][addr&0x1FFF]);
-#endif
-}
-#endif
+//inline	WORD	OP6502W( WORD addr )
+//{
+//#if	0
+//	WORD	ret;
+//	ret  = (WORD)CPU_MEM_BANK[(addr+0)>>13][(addr+0)&0x1FFF];
+//	ret |= (WORD)CPU_MEM_BANK[(addr+1)>>13][(addr+1)&0x1FFF]<<8;
+//	return	ret;
+//#else
+//	
+//	#ifdef EMU_DUMP
+//	WORD w1 = g_mapper->Read( addr );
+//	WORD w2 = g_mapper->Read( addr+1 );
+//	return w1|(w2<<8);
+//	#else
+//	return	*((WORD*)&CPU_MEM_BANK[addr>>13][addr&0x1FFF]);
+//	#endif
+//#endif
+//}
+//#endif
 
 inline	BYTE	CPU::RD6502( WORD addr )
 {
@@ -633,11 +646,8 @@ inline	BYTE	CPU::RD6502( WORD addr )
 		return	nes->Read( addr );
 	} else {
 	// Dummy access
-		mapper->Read( addr, CPU_MEM_BANK[addr>>13][addr&0x1FFF] );
+		return mapper->Read( addr );
 	}
-
-	// Quick bank read
-	return	CPU_MEM_BANK[addr>>13][addr&0x1FFF];
 }
 
 inline	WORD	CPU::RD6502W( WORD addr )
@@ -645,20 +655,22 @@ inline	WORD	CPU::RD6502W( WORD addr )
 	if( addr < 0x2000 ) {
 	// RAM (Mirror $0800, $1000, $1800)
 		return	*((WORD*)&RAM[addr&0x07FF]);
-	} else if( addr < 0x8000 ) {
+	} else //if( addr < 0x8000 ) 
+	{
 	// Others
 		return	(WORD)nes->Read(addr)+(WORD)nes->Read(addr+1)*0x100;
 	}
+	//return	(WORD)nes->Read(addr)+(WORD)nes->Read(addr+1)*0x100;
 
 	// Quick bank read
-#if	0
-	WORD	ret;
-	ret  = (WORD)CPU_MEM_BANK[(addr+0)>>13][(addr+0)&0x1FFF];
-	ret |= (WORD)CPU_MEM_BANK[(addr+1)>>13][(addr+1)&0x1FFF]<<8;
-	return	ret;
-#else
-	return	*((WORD*)&CPU_MEM_BANK[addr>>13][addr&0x1FFF]);
-#endif
+//#if	0
+//	WORD	ret;
+//	ret  = (WORD)CPU_MEM_BANK[(addr+0)>>13][(addr+0)&0x1FFF];
+//	ret |= (WORD)CPU_MEM_BANK[(addr+1)>>13][(addr+1)&0x1FFF]<<8;
+//	return	ret;
+//#else
+//	return	*((WORD*)&CPU_MEM_BANK[addr>>13][addr&0x1FFF]);
+//#endif
 }
 
 // 儊儌儕儔僀僩
@@ -680,6 +692,8 @@ void	CPU::Reset()
 {
 	apu = nes->apu;
 	mapper = nes->mapper;
+	g_mapper = mapper;
+
 
 	R.A  = 0x00;
 	R.X  = 0x00;
@@ -991,35 +1005,20 @@ register BYTE	DT;
 			case REL:iInstructionLen = 2;break;
 			}
 
-		/*#if	defined(_DEBUG) || defined(_DEBUGOUT)
-		static char str[10][100]={0};
-		static int iCount = 0;
-		static int iSet = 0;
-		static int oSet = 0;
-
-		if(!Config.emulator.bIllegalOp)
-		{
-			if(iSet==10) iSet=0;
-			if(iCount<9) iCount++;
-			DecodeInstruction (R.PC-1, str[iSet]);
-			oSet = iSet;
-			iSet++;
-		}
-		#endif*/
-
 		if( ((TraceArr[opcode][0]=='*') ||
 			 (TraceArr[opcode][1]=='?'))&&
 			(!Config.emulator.bIllegalOp) )
 		{
 			//这里可以优化输出信息
-			char str[111];
-			DecodeInstruction (R.PC-1, str);			 
-			DEBUGOUT( "Bad Instruction:%s\n",str);
+			//char str[111];
+			//DecodeInstruction (R.PC-1, str);			 
+			//DEBUGOUT( "Bad Instruction:%s\n",str);
 			R.PC=(R.PC-1)+iInstructionLen;
 			ADD_CYCLE(iInstructionLen*2);
 			goto end_is;
 		}
 		//
+		
 
 		switch( opcode ) {
 			case	0x69: // ADC #$??
@@ -2001,7 +2000,7 @@ register BYTE	DT;
 			case	0xF2:  /* JAM */
 			default:
 				if( !Config.emulator.bIllegalOp ) 
-				{
+				{	
 					throw	CApp::GetErrorString( IDS_ERROR_ILLEGALOPCODE );
 					goto	_execute_exit;
 				} 

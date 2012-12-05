@@ -79,32 +79,26 @@ void	GeniusMerioBros::WriteLow( WORD A, BYTE V )
 
 
 
-
-
-
+//Super Mario Bros. 2j (Unl) [U][!]
 void	smb2j::Reset()
 {
-  prg=~0;
+	prg=0;
   
-		IRQa=0;
-		IRQCount=0;
-  //setprg4r(1,0x5000,1);
-  //setprg8r(1,0x6000,1);
-	SetPROM_32K_Bank( prg );	
-	SetVROM_8K_Bank( 0 );
-	memcpy(WRAM , PROM+0x2000*9,0x800);
+	memcpy(MRAM,&PROMPTR[1][0x1000],0x1000);
+	SetPrg8r(1,0x6000,1);
+	SetPROM_32K_Bank(prg);
+	SetVROM_8K_Bank(0);
+	SetVRAM_Mirror(VRAM_VMIRROR);	
+	IRQa=0;
+	IRQCount=0;
 }
-
 
 void	smb2j::Write(WORD A, BYTE V )// (0x4020,0xffff)
 {
 	if(A==0x4022)
 	{
 		prg=V&1;
-		//setprg4r(1,0x5000,1);
-		//setprg8r(1,0x6000,1);
-		SetPROM_32K_Bank( prg );	
-		//SetVROM_8K_Bank( 0 );
+		SetPROM_32K_Bank( prg );
 	}
 	if(A==0x4122)
 	{
@@ -116,22 +110,10 @@ void	smb2j::Write(WORD A, BYTE V )// (0x4020,0xffff)
 
 void	smb2j::WriteLow( WORD A, BYTE V )
 {
-	if(A==0x4022)
-	{
-		prg=V&1;
-		//setprg4r(1,0x5000,1);
-		//setprg8r(1,0x6000,1);
-		SetPROM_32K_Bank( 1 );	
-		//SetVROM_8K_Bank( 0 );
-	}
-	if(A==0x4122)
-	{
-		IRQa=V;
-		IRQCount=0;
-		nes->cpu->ClrIRQ( IRQ_MAPPER );
-	}
+	Write(A,V);
 }
-void	smb2j::HSync( INT a )
+
+void	smb2j::Clock( INT a )
 {
 	if(IRQa)
 	{
@@ -141,44 +123,47 @@ void	smb2j::HSync( INT a )
   }
 }
 
-BYTE	smb2j::ReadLow ( WORD addr )
+BYTE	smb2j::ReadLow ( WORD A )
 {
-	if(addr>=0x5000)
-	{
-		addr =24576;//(addr+0xC000);
-		BYTE ch = CPU_MEM_BANK[0][addr&0x800];//14000		
-		return WRAM[addr&0x800];
-	}
-	//return *prg.Source().Mem( address + prgLowerOffset );
-	return (BYTE)(addr>>8);
+	if( (A>=0x5000)&&(A<0x6000) )
+		return MRAM[A-0x5000];
+	return Mapper::ReadLow(A);
 }
 
-Mapper8157::Mapper8157( NES* parent ) : Mapper(parent)
-{
-	mode = 0;
-}
-
+//20in1 4in1
 void	Mapper8157::Reset()
 {
-	if(mode==0)
-		mode = 0x100;
+	cmdreg=0x200;
+	invalid_data=1;
+	Sync();
+}
+
+void	Mapper8157::SoftReset()
+{
+	cmdreg=0x200;
+	invalid_data^=1;
+	Sync();
+}
+
+void	Mapper8157::Sync(void)
+{
+	SetPrg16r((cmdreg&0x060)>>5,0x8000,(cmdreg&0x01C)>>2);
+	SetPrg16r((cmdreg&0x060)>>5,0xC000,(cmdreg&0x200)?(PROM_16K_SIZE/4-1):0);
+	SetVRAM_Mirror(((cmdreg&2)>>1)^1);
+}
+
+BYTE Mapper8157::Read( WORD A)
+{
+	if(invalid_data&&cmdreg&0x100)
+		return 0xFF;
 	else
-		mode = 0;
-	trash=0;
-	Mapper8157::Write(0x8000,0);
+		return Mapper::Read(A);
 }
 
 void	Mapper8157::Write(WORD A, BYTE V )
 {
-	trash = (A & mode ) ? 0xFF : 0x00;
-	
-	SetPROM_16K_Bank(4,(A >> 2 & 0x18) | (A >> 2 & 0x7));
-	SetPROM_16K_Bank(6,(A >> 2 & 0x18) | ((A & 0x200) ? 0x7 : 0x0));
-	
-	if(A & 0x2)
-		SetVRAM_Mirror( VRAM_HMIRROR );
-	else
-		SetVRAM_Mirror( VRAM_VMIRROR);
+	cmdreg=A;
+	Sync();
 }
 
 

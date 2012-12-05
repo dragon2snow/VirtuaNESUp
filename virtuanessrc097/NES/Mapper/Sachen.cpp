@@ -43,8 +43,8 @@ void	Sachen::Read( WORD A, BYTE V )
 {
 	if(pRead)
 		(this->*pRead)(A,V);
-	else
-		Mapper::Read(A,V);
+	//else
+	//	Mapper::Read(A,V);
 }
 	
 BYTE	Sachen::ReadLow ( WORD A )

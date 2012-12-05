@@ -689,29 +689,37 @@ string	path;
 		// ƒwƒbƒ_ƒRƒs[
 		memcpy( &header, temp, sizeof(NESHEADER) );
 
-		if( header.ID[0] == 'N' && header.ID[1] == 'E'
-		 && header.ID[2] == 'S' && header.ID[3] == 0x1A ) {
+		if( header.ID[0] == 'N' && header.ID[1] == 'E' && header.ID[2] == 'S' && header.ID[3] == 0x1A ) 
+		{
 			// ƒwƒbƒ_ƒRƒs[
 //			memcpy( &header, temp, sizeof(NESHEADER) );
-		} else if( header.ID[0] == 'F' && header.ID[1] == 'D'
-			&& header.ID[2] == 'S' && header.ID[3] == 0x1A ) {
+		}
+		else if( header.ID[0] == 'F' && header.ID[1] == 'D'	&& header.ID[2] == 'S' && header.ID[3] == 0x1A ) 
+		{
 			// ƒwƒbƒ_ƒRƒs[
 //			memcpy( &header, temp, sizeof(NESHEADER) );
-		} else if( header.ID[0] == 'N' && header.ID[1] == 'E'
-			&& header.ID[2] == 'S' && header.ID[3] == 'M') {
+		}
+		else if( header.ID[0] == 'N' && header.ID[1] == 'E' && header.ID[2] == 'S' && header.ID[3] == 'M') 
+		{
 			// ƒwƒbƒ_ƒRƒs[
 //			memcpy( &header, temp, sizeof(NESHEADER) );
-		} else if( header.ID[0] == 'U' && header.ID[1] == 'N'
-			&& header.ID[2] == 'I' && header.ID[3] == 'F' ) {
+		} 
+		else if( header.ID[0] == 'U' && header.ID[1] == 'N'	&& header.ID[2] == 'I' && header.ID[3] == 'F' ) 
+		{
 			// ƒwƒbƒ_ƒRƒs[
 //			memcpy( &header, temp, sizeof(NESHEADER) );
 		}
 		else{
 			FREE( temp );
+			FREE( pUnif );
 			temp = NULL;
 			if( !UnCompress( path.c_str(), &temp, (LPDWORD)&FileSize ) )
 				goto	_error_return;
 			memcpy( &header, temp, sizeof(NESHEADER) );
+
+			filesize = FileSize;
+			pUnif = (LPBYTE)::malloc( FileSize );
+			memcpy(pUnif,temp,FileSize);
 		}
 		if( header.ID[0] == 'U' && header.ID[1] == 'N'&& header.ID[2] == 'I' && header.ID[3] == 'F' )
 		{
@@ -826,8 +834,8 @@ string	path;
 		else if( header.ID[0] == 'N' && header.ID[1] == 'E'
 		 && header.ID[2] == 'S' && header.ID[3] == 0x1A ) {//´¦ÀíNES ROM
 			fl.mapper = ((header.control1&0xF0)>>4)|(header.control2&0xF0);
-			fl.prg_size = header.PRG_PAGE_SIZE;
-			fl.chr_size = header.CHR_PAGE_SIZE;
+			fl.prg_size = header.dummy_PRG_PAGE_SIZE;
+			fl.chr_size = header.dummy_CHR_PAGE_SIZE;
 			CHAR	szTemp[64];
 			::wsprintf( szTemp, "%s%s%s%s %s",
 				(header.control1&0x01)?"V":"H",
@@ -926,6 +934,7 @@ string	path;
 		}
 
 		FREE(temp);
+		FREE(pUnif);
 	}
 	return;
 
@@ -944,6 +953,7 @@ LPSTR	pszExt[] = {
 	"*.nsf",
 	"*.lzh",
 	"*.zip",
+	"*.7z",
 	"*.cab",
 	"*.rar",
 	NULL

@@ -14,14 +14,15 @@ public:
 	void LoadState( LPBYTE p );
 
 protected:
-	BYTE    strobe;
-	BYTE	security;
-	BYTE	trigger;
-	BYTE	rom_type;
+	//BYTE    strobe;
+	//BYTE	security;
+	//BYTE	trigger;
+	//BYTE	rom_type;
 
-	BYTE	reg[2];
-
-//private:
-
+	//BYTE	reg[2];
+	BYTE laststrobe, trigger;
+	BYTE reg[8];
 };
+
+
 

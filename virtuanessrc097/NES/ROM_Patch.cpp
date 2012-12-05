@@ -359,3 +359,104 @@ if( crc == 0xeb2dba63		// VS TKO Boxing
 if( mapper == 99 || mapper == 151 ) {
 	header.control2 |= ROM_VSUNISYSTEM;
 }
+
+//扩展修正
+if(  crc == 0x78fb3ed6 )//甲A
+{
+	mapper = 74;
+}
+if(  crc == 0x02c41438 )
+{
+	mapper = 176;
+}
+
+if(  crc == 0x37ae04a8 )//赌神
+{
+	mapper = 191;
+}
+
+if(  crc == 0x9767dc74
+   ||crc == 0xff93eff0
+   ||crc == 0x9fb1ee82
+   ||crc == 0x1ee6d43b )//金庸
+{
+	mapper = 192;
+}
+
+if(  crc == 0xeae675ea
+   ||crc == 0x6bab54b7 
+   ||crc == 0x7c896b5e )//第二次机器人大战
+{
+	mapper = 194;
+}
+
+if(  crc == 0xb1b32c8b //赌神
+   ||crc == 0xe2b43a70 
+   ||crc == 0x3f3036d7 
+   ||crc == 0x1a13ba25 
+   ||crc == 0xc69233dc
+   ||crc == 0xdf993993 //天使之翼2
+   ||crc == 0xae185a13
+   ||crc == 0xf60beecb //足球小将2
+   ||crc == 0xc856f188 )//天神之剑
+{
+	mapper = 195;
+}
+
+if(  crc == 0x9993304c
+   ||crc == 0x50e9c2b5 )//混沌世纪
+{
+	//Mirroring should be set to "Horizontal".  
+	//PAL
+	mapper = 195;
+}
+
+if(  crc == 0xe80d8741 )//三国志2
+{
+	mapper = 199;
+}
+if(  crc == 0xb5e83c9a//星际争霸
+   ||crc == 0xfb2b6b10)//反恐精英
+{
+	mapper = 241;
+}
+
+//特殊补丁,WXN支持代码
+//WAIXING_FS005
+if(  crc == 0xc768098b//三侠五义
+   ||crc == 0x49f22159//超级大富翁
+   ||crc == 0xf29c8186//大富翁2
+   ||crc == 0xf354d847//格兰蒂亚
+   )
+{
+	bUnif = 1;
+	//mapper= WAIXING_FS005;
+	board = WAIXING_FS005;
+	pboardname[0] = 0;
+}
+
+if(  crc == 0x8eb4bb51//宠物红
+   )
+{
+	mapper= 164;
+}
+
+if( crc==0xeb08bfe9)
+{
+	bUnif = 1;
+	board = FK23CA;
+}
+
+
+if( crc==0x58BCACF6)
+{
+	mapper= 45;
+}
+
+if( crc==0x4884293a )
+{//Fighting Hero
+	header.control1 = ROM_VMIRROR;
+}
+
+	crcall;
+	crcvrom;

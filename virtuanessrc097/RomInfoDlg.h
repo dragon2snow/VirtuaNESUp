@@ -27,15 +27,19 @@ public:
 		m_dwCRC    = 0;
 		m_dwCRCALL = 0;
 		m_dwCRCCHR = 0;
+		m_bUnif    = 0;
+		m_pszBoard = NULL;
 	}
 
 	// Override from CWnd
 	INT	DoModal( HWND hWndParent );
 
 	CHAR	m_szName[_MAX_PATH];
+	CHAR	*m_pszBoard;
 	INT	m_nMapper;
 	INT	m_nPRG;
 	INT	m_nCHR;
+	BOOL	m_bUnif;
 	BOOL	m_bMirror;
 	BOOL	m_bSram;
 	BOOL	m_b4Screen;

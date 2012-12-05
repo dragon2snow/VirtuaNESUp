@@ -3,183 +3,110 @@
 //////////////////////////////////////////////////////////////////////////
 void	Mapper253::Reset()
 {
-//	nes->ppu->SetVromWrite(1);
-	for( INT i = 0; i < 8; i++ ) {
-		reg[i] = i;
+	for(int i=0; i<8; i++)
+	{
+		chrlo[i]=chrhi[i]=0;
 	}
-	reg[8] = 0;
+	prg[0]=prg[1]=0;
+	mirr = vlock = 0;
+	IRQa = IRQCount = IRQLatch = IRQClock = 0; 
 
-	irq_enable = 0;
-	irq_counter = 0;
-	irq_latch = 0;
-	irq_clock = 0;
-	VRAM_switch = 0;
-	rom_type = 0;
-	SetPROM_32K_Bank( 0, 1, PROM_8K_SIZE-2, PROM_8K_SIZE-1 );
-	SetVROM_8K_Bank( 0 );
-
-	DWORD	crc = nes->rom->GetPROM_CRC();
-	if( crc == 0x0530b26e ) {
-		rom_type = 1;
-	}
+	Sync();
 }
 
-void	Mapper253::Write( WORD addr, BYTE data )
+void	Mapper253::Write( WORD A, BYTE V )
 {
-	if( addr == 0x8010 ) {
-		SetPROM_8K_Bank( 4, data );
-		return;
-	}
-	if( addr == 0xA010 ) {
-		SetPROM_8K_Bank( 5, data );
-		return;
-	}
-	if( addr == 0x9400 ) {
-		data &= 0x03;
-		if( data == 0 )	     SetVRAM_Mirror( VRAM_VMIRROR );
-		else if( data == 1 ) SetVRAM_Mirror( VRAM_HMIRROR );
-		else if( data == 2 ) SetVRAM_Mirror( VRAM_MIRROR4L );
-		else		     SetVRAM_Mirror( VRAM_MIRROR4H );
-	}
-	switch( addr & 0xF00C ) {
-		case 0xB000:
-			reg[0] = (reg[0] & 0xF0) | (data & 0x0F);
-			SetBank_PPUSUB( 0, reg[0] );
-			break;	
-		case 0xB004:
-			reg[0] = (reg[0] & 0x0F) | ((data & 0x0F) << 4);
-			SetBank_PPUSUB( 0, reg[0] + ((data>>4)*0x100) );
-			break;
-		case 0xB008:
-			reg[1] = (reg[1] & 0xF0) | (data & 0x0F);
-			SetBank_PPUSUB( 1, reg[1] );
-			break;
-		case 0xB00C:
-			reg[1] = (reg[1] & 0x0F) | ((data & 0x0F) << 4);
-			SetBank_PPUSUB( 1, reg[1] + ((data>>4)*0x100) );
-			break;
-		case 0xC000:
-			reg[2] = (reg[2] & 0xF0) | (data & 0x0F);
-			SetBank_PPUSUB( 2, reg[2] );
-			break;
-		case 0xC004:
-			reg[2] = (reg[2] & 0x0F) | ((data & 0x0F) << 4);
-			SetBank_PPUSUB( 2, reg[2] + ((data>>4)*0x100) );
-			break;
-		case 0xC008:
-			reg[3] = (reg[3] & 0xF0) | (data & 0x0F);
-			SetBank_PPUSUB( 3, reg[3] );
-			break;
-		case 0xC00C:
-			reg[3] = (reg[3] & 0x0F) | ((data & 0x0F) << 4);
-			SetBank_PPUSUB( 3, reg[3] + ((data>>4)*0x100) );
-			break;
-		case 0xD000:
-			reg[4] = (reg[4] & 0xF0) | (data & 0x0F);
-			SetBank_PPUSUB( 4, reg[4] );
-			break;
-		case 0xD004:
-			reg[4] = (reg[4] & 0x0F) | ((data & 0x0F) << 4);
-			SetBank_PPUSUB( 4, reg[4] + ((data>>4)*0x100) );
-			break;
-		case 0xD008:
-			reg[5] = (reg[5] & 0xF0) | (data & 0x0F);
-			SetBank_PPUSUB( 5, reg[5] );
-			break;
-		case 0xD00C:
-			reg[5] = (reg[5] & 0x0F) | ((data & 0x0F) << 4);
-			SetBank_PPUSUB( 5, reg[5] + ((data>>4)*0x100) );
-			break;
-		case 0xE000:
-			reg[6] = (reg[6] & 0xF0) | (data & 0x0F);
-			SetBank_PPUSUB( 6, reg[6] );
-			break;
-		case 0xE004:
-			reg[6] = (reg[6] & 0x0F) | ((data & 0x0F) << 4);
-			SetBank_PPUSUB( 6, reg[6] + ((data>>4)*0x100) );
-			break;
-		case 0xE008:
-			reg[7] = (reg[7] & 0xF0) | (data & 0x0F);
-			SetBank_PPUSUB( 7, reg[7] );
-			break;
-		case 0xE00C:
-			reg[7] = (reg[7] & 0x0F) | ((data & 0x0F) << 4);
-			SetBank_PPUSUB( 7, reg[7] + ((data>>4)*0x100) );
-			break;
-		case 0xF000:
-			irq_latch = (irq_latch & 0xF0) | (data & 0x0F);
-			break;
-		case 0xF004:
-			irq_latch = (irq_latch & 0x0F) | ((data & 0x0F) << 4);
-			break;
-		case 0xF008:
-			irq_enable = data & 0x03;
-			if( irq_enable & 0x02 ) {
-				irq_counter = irq_latch;
-				irq_clock = 0;
-			}
-			nes->cpu->ClrIRQ( IRQ_MAPPER );
-			break;
-	}
+  if((A>=0xB000)&&(A<=0xE00C))
+  {
+    uint8 ind=((((A&8)|(A>>8))>>3)+2)&7;
+    uint8 sar=A&4;
+    chrlo[ind]=(chrlo[ind]&(0xF0>>sar))|((V&0x0F)<<sar);
+    if(A&4)
+      chrhi[ind]=V>>4;
+    Sync();
+  }
+  else
+   switch(A)
+    {
+      case 0x8010: prg[0]=V; Sync(); break;
+      case 0xA010: prg[1]=V; Sync(); break;
+      case 0x9400: mirr=V&3; Sync(); break;
+      case 0xF000: IRQLatch = (IRQLatch & 0xF0) | (V & 0x0F); break;
+      case 0xF004: IRQLatch = (IRQLatch & 0x0F) | (V << 4); break;
+      case 0xF008:
+        IRQa = V&3;
+        if(IRQa&2)
+        {
+          IRQCount = IRQLatch;
+          IRQClock = 0;
+        }
+		nes->cpu->ClrIRQ( IRQ_MAPPER );
+        break;
+    }
+
+
+
 }
 
-void	Mapper253::SetBank_PPUSUB( int bank, int page )
+void	Mapper253::Sync(void)
 {
-	if(rom_type == 1){
-		if(page == 0x88){
-			VRAM_switch = 0;
-			return;
-		}else if(page == 0xc8){
-			VRAM_switch = 1;
-			return;
-		}
-	}
-	if( (page == 4) || (page == 5) ) {
-		if( (VRAM_switch==0)&&(rom_type==1) ){
-			SetVROM_1K_Bank( bank, page );
-		} else {
-			SetCRAM_1K_Bank( bank, page );
-		}
-	} else {
-			SetVROM_1K_Bank( bank, page );
-	}
+  uint8 i;
+  //setprg8r(0x10,0x6000,0);
+  SetPrg8(0x8000,prg[0]);
+  SetPrg8(0xa000,prg[1]);
+  SetPrg8(0xc000,PROM_8K_SIZE-2);
+  SetPrg8(0xe000,PROM_8K_SIZE-1);
+  for(i=0; i<8; i++)
+  {
+    uint32 chr = chrlo[i]|(chrhi[i]<<8);
+    if(chrlo[i]==0xc8)
+    {
+      vlock = 0;
+      continue;
+    }
+    else if(chrlo[i]==0x88)
+    {
+      vlock = 1;
+      continue;
+    }
+    if(((chrlo[i]==4)||(chrlo[i]==5))&&!vlock)
+      SetCRAM_1K_Bank(i,chr&1);
+    else
+      SetVROM_1K_Bank(i,chr);
+  }
+  switch(mirr)
+  {
+    case 0: SetVRAM_Mirror(VRAM_VMIRROR); break;
+    case 1: SetVRAM_Mirror(VRAM_HMIRROR); break;
+    case 2: SetVRAM_Mirror(VRAM_MIRROR4L); break;
+    case 3: SetVRAM_Mirror(VRAM_MIRROR4H); break;
+  }
 }
+
 
 void	Mapper253::Clock( INT cycles )
 {
-	if( irq_enable & 0x02 ) {
-		if( (irq_clock+=cycles) >= 0x72 ) {
-			irq_clock -= 0x72;
-			if( irq_counter == 0xFF ) 
-			{
-				irq_counter = irq_latch;
-				irq_enable = (irq_enable & 0x01) * 3;
-				nes->cpu->SetIRQ( IRQ_MAPPER );
-			} else {
-				irq_counter++;
-			}
-		}
-	}
+  if(IRQa&2) 
+  {
+    if((IRQClock+=cycles)>=0x72) 
+    {
+      IRQClock -= 0x72;
+      if(IRQCount==0xFF)  
+      {
+        IRQCount = IRQLatch;
+        IRQa = IRQa|((IRQa&1)<<1);
+		nes->cpu->SetIRQ( IRQ_MAPPER );
+      }
+      else 
+        IRQCount++;
+    }
+  }
 }
 
 void	Mapper253::SaveState( LPBYTE p )
 {
-	for( INT i = 0; i < 9; i++ ) {
-		p[i] = reg[i];
-	}
-	p[ 9] = irq_enable;
-	p[10] = irq_counter;
-	p[11] = irq_latch;
-	*(INT*)&p[12] = irq_clock;
 }
 
 void	Mapper253::LoadState( LPBYTE p )
 {
-	for( INT i = 0; i < 9; i++ ) {
-		reg[i] = p[i];
-	}
-	irq_enable  = p[ 9];
-	irq_counter = p[10];
-	irq_latch   = p[11];
-	irq_clock   = *(INT*)&p[12];
 }

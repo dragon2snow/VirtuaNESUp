@@ -35,6 +35,7 @@ protected:
 
 	BYTE	vs_patch;
 	BYTE	vs_index;
+	BYTE	KT_bank;
 
 private:
 	void	SetBank_CPU();

@@ -6,6 +6,8 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
+		Dump_Debug|Win32 = Dump_Debug|Win32
+		Dump_Release|Win32 = Dump_Release|Win32
 		Profile|Win32 = Profile|Win32
 		Release_Debugout|Win32 = Release_Debugout|Win32
 		Release|Win32 = Release|Win32
@@ -13,6 +15,10 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{74829950-BB9D-4294-9EC7-65DE4576C688}.Debug|Win32.ActiveCfg = Debug|Win32
 		{74829950-BB9D-4294-9EC7-65DE4576C688}.Debug|Win32.Build.0 = Debug|Win32
+		{74829950-BB9D-4294-9EC7-65DE4576C688}.Dump_Debug|Win32.ActiveCfg = Dump_Debug|Win32
+		{74829950-BB9D-4294-9EC7-65DE4576C688}.Dump_Debug|Win32.Build.0 = Dump_Debug|Win32
+		{74829950-BB9D-4294-9EC7-65DE4576C688}.Dump_Release|Win32.ActiveCfg = Dump_Release|Win32
+		{74829950-BB9D-4294-9EC7-65DE4576C688}.Dump_Release|Win32.Build.0 = Dump_Release|Win32
 		{74829950-BB9D-4294-9EC7-65DE4576C688}.Profile|Win32.ActiveCfg = Profile|Win32
 		{74829950-BB9D-4294-9EC7-65DE4576C688}.Profile|Win32.Build.0 = Profile|Win32
 		{74829950-BB9D-4294-9EC7-65DE4576C688}.Release_Debugout|Win32.ActiveCfg = Release_Debugout|Win32

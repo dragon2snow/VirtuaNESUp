@@ -27,3 +27,26 @@ private:
 	void	SetBank_CPU();
 	void	SetBank_PPU();
 };
+
+
+
+class	MapperUNL_FS304 : public Mapper
+{
+public:
+	MapperUNL_FS304( NES* parent ) : Mapper(parent) {}
+
+	void	Reset();
+	void	WriteLow(WORD addr, BYTE data);
+	BYTE	ReadLow ( WORD A );
+
+	// For state save
+	BOOL	IsStateSave() { return TRUE; }
+	void	SaveState( LPBYTE p ){}
+	void	LoadState( LPBYTE p ){}
+
+protected:
+	BYTE	reg[8];
+
+private:
+	void	Sync();
+};

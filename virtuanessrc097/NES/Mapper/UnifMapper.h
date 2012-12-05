@@ -24,10 +24,10 @@ public:
 	smb2j( NES* parent ) : Mapper(parent) {}
 	
 	void	Reset();
-	void	Write( WORD addr, BYTE data );// (0x4020,0xffff,UNLSMB2JWrite);
+	void	Write( WORD addr, BYTE data );
 	void	WriteLow( WORD addr, BYTE data );
 	BYTE	ReadLow ( WORD addr );
-	void	HSync( INT scanline );
+	void	Clock( INT cycles );
 	
 protected:
 	
@@ -39,15 +39,17 @@ private:
 class	Mapper8157 : public Mapper
 {
 public:
-	Mapper8157( NES* parent );
+	Mapper8157( NES* parent ) : Mapper(parent) {}
 	
 	void	Reset();
+	void	SoftReset();
 	void	Write( WORD addr, BYTE data );
-	//void	Read( WORD addr, BYTE data );
+	BYTE	Read( WORD addr);
+	void	Sync(void);
 	
 protected:
-	WORD mode;
-	BYTE trash;
+	WORD cmdreg;
+	BYTE invalid_data;
 private:
 };
 

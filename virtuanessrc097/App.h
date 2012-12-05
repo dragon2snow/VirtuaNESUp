@@ -9,6 +9,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
+#pragma warning (disable:4996)
 
 #define	ERRORSTRING_MAX	32
 

@@ -41,11 +41,14 @@ DLGMSG	CAboutDlg::OnInitDialog( DLGMSGPARAM )
 
 	TCHAR	str[256];
 
-	::wsprintf( str, "VirtuaNES version %01d.%01d%01d%s",
+	/*::wsprintf( str, "VirtuaNES version %01d.%01d%01d%s\r\nbyemu compile:%s",
 		    (VIRTUANES_VERSION&0xF00)>>8,
 		    (VIRTUANES_VERSION&0x0F0)>>4,
 		    (VIRTUANES_VERSION&0x00F),
-		    VIRTUANES_FIXVERSION );
+		    VIRTUANES_FIXVERSION,__DATE__);*/
+
+	::wsprintf( str, "VirtuaNES Ver: %s",__DATE__);
+
 
 	::SetDlgItemText( m_hWnd, IDC_VER_VERSION, str );
 
