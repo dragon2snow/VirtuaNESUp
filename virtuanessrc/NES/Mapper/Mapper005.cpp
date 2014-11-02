@@ -88,6 +88,9 @@ INT	i;
 	if( crc == 0xe91548d8 ) { // Shin 4 Nin Uchi Mahjong - Yakuman Tengoku(J)
 		chr_type = 1;
 	}
+	isUnl = 0;
+	if (!VROM_1K_SIZE)
+		isUnl = 1;
 
 	nes->ppu->SetExtLatchMode( TRUE );
 	nes->apu->SelectExSound( 8 );
@@ -377,8 +380,12 @@ INT	i;
 		switch( chr_size ) {
 			case	0:
 				for( i = 0; i < 8; i++ ) {
-					BG_MEM_BANK[i] = VROM+0x2000*(chr_page[1][7]%VROM_8K_SIZE)+0x0400*i;
-					BG_MEM_PAGE[i] = (chr_page[1][7]%VROM_8K_SIZE)*8+i;
+					if (!isUnl)
+					{
+						BG_MEM_BANK[i] = VROM + 0x2000 * (chr_page[1][7] % VROM_8K_SIZE) + 0x0400 * i;
+						BG_MEM_PAGE[i] = (chr_page[1][7] % VROM_8K_SIZE) * 8 + i;
+					}
+					//SetCRAM_8K_Bank(chr_page[1][7]);
 				}
 				break;
 			case	1:
@@ -569,8 +576,16 @@ BOOL	bSplit;
 				chr_l = PPU_MEM_BANK[tileadr>>10][ tileadr&0x03FF   ];
 				chr_h = PPU_MEM_BANK[tileadr>>10][(tileadr&0x03FF)+8];
 			} else {
-				chr_l = BG_MEM_BANK[tileadr>>10][ tileadr&0x03FF   ];
-				chr_h = BG_MEM_BANK[tileadr>>10][(tileadr&0x03FF)+8];
+				if (isUnl)
+				{
+					chr_l = PPU_MEM_BANK[tileadr >> 10][tileadr & 0x03FF];
+					chr_h = PPU_MEM_BANK[tileadr >> 10][(tileadr & 0x03FF) + 8];
+				}
+				else
+				{
+					chr_l = BG_MEM_BANK[tileadr >> 10][tileadr & 0x03FF];
+					chr_h = BG_MEM_BANK[tileadr >> 10][(tileadr & 0x03FF) + 8];
+				}
 			}
 		}
 	} else {

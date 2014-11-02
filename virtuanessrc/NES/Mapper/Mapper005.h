@@ -58,6 +58,8 @@ protected:
 
 	BYTE	mult_a, mult_b;		// $5205-$5206
 
+	BYTE    isUnl;
+
 private:
 	void	SetBank_CPU( WORD addr, BYTE data );
 	void	SetBank_SRAM( BYTE page, BYTE data );
